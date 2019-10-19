@@ -1,0 +1,11 @@
+name: "Data Analysis Portfolio"
+output_dir: '.'
+output:
+  html_document:
+    theme: cosmo
+    highlight: zenburn
+    toc: true
+    toc_depth: 2
+    toc_float: 
+      collapsed: false  
+    css: customstyles.css

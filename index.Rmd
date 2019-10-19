@@ -1,0 +1,10 @@
+---
+title: "Data Analysis Portfolio"
+output: 
+  html_document:
+    toc: FALSE
+---
+
+This is a website of data analysis exercises for the Modern Applied Data Analysis (MADA) course taught by Dr. Andreas Handel at University of Georgia.
+
+Click on the menu links above to see the analysis results and to learn more about me.

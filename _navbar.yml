@@ -1,0 +1,19 @@
+title: "Data Analysis Exercise Website"
+type: inverse
+left:
+  - text: "Analyses"
+    menu:
+      - text: "First Coding Exercise"
+        href: ./Coding.html
+      - text: "Visualization: Trump Ratings"
+        href: ./Visualization.html
+      - text: "TidyTuesday: Pizza Stores"
+        href: ./TidyTuesday.html
+      - text: "Continuous Outcome Analysis"
+        href: ./Continuous_Outcome_Analysis.html
+      - text: "Future Analysis"
+  - text: "About the Author"
+    href: "./Author.html"
+right:
+  - icon: fa-github fa-lg
+    href: https://github.com/epid8060fall2019/EllenCheng_dataanalysis
