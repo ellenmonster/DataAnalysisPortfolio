@@ -1,0 +1,195 @@
+---
+title: "TidyTuesday1"
+author: Ellen Cheng
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Load Libraries
+```{r libraries}
+library(tidyverse)
+library(magrittr)
+library(leaflet)
+library(shiny)
+```
+I selected the 'Barstool' sports dataset to work with in this exercise. This dataset has pizza ratings from three sectors (critic, public, Barstool staff), pricing, location, and geo-location. 
+
+## Get the Data
+```{r get_data}
+barstool <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-10-01/pizza_barstool.csv")
+```
+
+I'll examine the structure of the dataset and pick out a subset of variables relevant for answering interesting questions with visualizations. 
+
+### Format & examine the data
+```{r glimpse_data}
+glimpse(barstool)
+```
+
+I don't understand (from the data or from the dataset definitions) what the provider ratings are, so I'm going to just use the community, critic, and Dave (barstool staff, it seems) scores. The total score is just the average score multiplied by the count, so I'll drop the total score columns. Some of the names are very long, so I'll shorten them for ease of use. 
+```{r format_data}
+barstool2 <- barstool %>%
+  dplyr::select(name, city, zip, latitude, longitude, price_level, comm_avg = review_stats_community_average_score, comm_count = review_stats_community_count, crit_avg = review_stats_critic_average_score, crit_count = review_stats_critic_count, dave_avg = review_stats_dave_average_score, dave_count = review_stats_dave_count) %>%
+  mutate_at(c("name", "city", "zip"), as.factor)
+```
+
+Let's check the data to see if there is anything funny to make note of
+```{r check_data}
+summary(barstool2)
+# There are only two records with NA's in the data--the NA's are in the latitude & longitude columns
+# Some pizza place names are represented in more than one row of data
+# There is at least one funny zip code: 1748 (has 4 digits instead of 5)
+# There are cases where comm_count and crit_count are 0. The corresponding average scores for these records should be changed to NA, not zero
+
+# When counts are zero, change the average score to zero (because it means that no one scored the place)
+barstool2$crit_avg[barstool2$crit_count == 0] # first check what the average scores are when the counts are zero--are there cases when actual scores are provided, which might indicate that the count is incorrect? The values are all zero. I should change them to NA
+length(barstool2$crit_avg[barstool2$crit_count == 0]) # Wow, there are actually a lot of cases where critics didn't score a pizza place--401 out of 463 places didn't have a critic's score
+barstool2$crit_avg[barstool2$crit_count == 0] <- NA
+
+barstool2$comm_avg[barstool2$comm_count == 0] # these are also all zero, and should be changed to NA
+length(barstool2$comm_avg[barstool2$comm_count == 0]) # there are only 41 pizza places missing community scores
+barstool2$comm_avg[barstool2$comm_count == 0] <- NA
+
+# Check the summary again...
+summary(barstool2) # there are now 41 NA's for comm_avg and 401 NA's for crit_avg--that is correct
+
+# Since price levels only range from 0 to 3 as integers, I'll convert this variable to an ordered factor for graphing
+barstool2$price_level <- factor(barstool2$price_level)
+
+# Extract the data records for pizza places represented more than once in the dataset, to see if they are duplicate records
+dup_names <- barstool2 %>%
+  group_by(name) %>%
+  filter(n() > 1) %>%
+  arrange(name)
+dup_names[, c("name", "zip", "latitude", "longitude")]
+# So I looked at this subset of data with 'View(dup_names)' and it turns out that the pizza place names that are repeated are chains that have multiple stores, so the data really do represent one store per record 
+```
+
+Here are some key things I've learned so far from examining the Barstool data:
+
+* Two records are missing latitude and longitude
+* Some data records have the same pizza place names, but these are validly independent records because they are different stores (different locations) in the same restaurant chain
+* Only 13% of the pizza places were scored by a critic
+* All pizza places were scored by Dave
+* 91% of pizza places were scored by the community
+
+### Summarize by location?
+
+It might be interesting to examine the scores grouped by location. Let's first see what sample sizes are working with --are the data pretty evenly distributed among cities, or among zip codes?
+```{r cities_zips}
+table(table(barstool2$city)) # 68 cities had only one rated pizza place, one city had 251 rated pizza places
+barstool2 %>%
+  group_by(city) %>%
+  tally() %>%
+  top_n(5) %>% # which cities had the highest number of rated pizza places? New York City
+  arrange(desc(n))
+
+table(table(barstool2$zip)) # 116 zip codes had only one rated pizza place
+barstool2 %>%
+  group_by(zip) %>%
+  tally() %>%
+  top_n(5) %>% # which zip had the highest number of rated pizza places? zip code 10019 (n = 25 rated places)
+  arrange(desc(n))
+```
+I originally thought I might be able to do something interesting with pizza place ratings by city or zip code, but it looks like most cities and zip codes only had one rated pizza place. Among cities, New York City had by far the largest number of rated pizza places (N = 251, with the next highest being Brooklyn with N = 20). Ratings were more evenly spread among zip codes (highest was N = 25 for zip code 10019, followed by N = 22 for zip codes 10012 & 10014). But with the zip codes, also, most (N = 116; `r round(116/length(unique(barstool2$zip))*100)`% of zip codes) had just one rated pizza place.
+
+<font color="blue">There are too many cities/zip codes, and the data aren't well spread among the cities/zip codes, so I don't want to compare data by these location variables.</font> 
+
+But here are some questions I can visually explore the data to answer...
+
+### Question: How well do Dave's scores correspond with community scores?
+We'll look at this in a few different ways...
+```{r Q_Dave_vs_comm1}
+# scatterplot
+ggplot(barstool2, aes(x = dave_avg, y = comm_avg, size = comm_count, color = price_level)) +
+  geom_point() +
+  scale_colour_brewer(palette = "Greens") +
+  theme_dark() +
+  geom_abline(color = "white") +
+  labs(x = "Dave's score", y = "Average community score", subtitle = "Size of dot is scaled to number of community voters \nPrice level ranges from 0 (cheap) to 3 (expensive) \nWhite line represents perfect correspondence")
+```
+<font color="blue">
+There is a pretty loose correspondence between Dave's score and the community score for a pizza place. A few things we notice:
+
+* The community tends to give higher scores than Dave does, especially for the pizza places Dave dislikes
+
+* Dave and the community tend to agree more on the better pizza places
+
+* One of the best-scored pizza place by both Dave and the community (and most scored by the community) has a price level of zero.
+</font>
+
+**Let's find out what that cheap but good pizza place is...**
+```{r Q_good_cheap_pizza}
+# I'm guessing these filter values from the graph
+dplyr::filter(barstool2, price_level==0, dave_avg > 8.25, comm_avg > 8.25, comm_count > 200) 
+```
+<font color="blue"> 
+Sauce Pizzeria in New York is the best cheap pizza among the places scored. That's my kind of pizza place.</font>
+
+**Compare Dave's and the community's scores in other ways...**
+```{r Q_Dave_vs_comm}
+# dotplot
+ggplot(barstool2) +
+  geom_dotplot(aes(x = price_level, y = dave_avg), binaxis='y', stackdir='center', dotsize=0.5) +
+  geom_hline(yintercept = median(barstool2$dave_avg, na.rm = TRUE), color = "red", linetype = "dashed") +
+  geom_text(x = 0.6, y = median(barstool2$dave_avg)+0.5, label = median(barstool2$dave_avg), size = 5, color = "red") +
+  labs(x = "Price level", y = "Dave's score", title = "Dave", subtitle = "(Red line is median score across all price levels; Each point represents a pizza place)")
+
+ggplot(barstool2) +
+  geom_dotplot(aes(x = price_level, y = comm_avg), binaxis='y', stackdir='center', dotsize=0.5) +
+  geom_hline(yintercept = median(barstool2$comm_avg, na.rm = TRUE), color = "red", linetype = "dashed") +
+  geom_text(x = 0.6, y = median(barstool2$comm_avg, na.rm = TRUE)+0.5, label = median(barstool2$comm_avg, na.rm = TRUE), size = 5, color = "red") +
+  labs(x = "Price level", y = "Average community score", title = "Community", subtitle = "(Red line is median score across all price levels; Each point represents a pizza place)")
+```
+<font color="blue"> 
+Not much new insight here. We do see that the median community score is higher than Dave's median score. BUT we don't have community scores for all the pizza places that Dave scored, so it's a big misleading to compare median values (for different datasets).</font>
+
+**Is there anything interesting about the pizza places the community did NOT score?**
+```{r no_comm}
+comm_scored_med <- median(barstool2$dave_avg[barstool2$comm_count >0], na.rm = TRUE) # 422 values
+comm_NOTscored_med <- median(barstool2$dave_avg[barstool2$comm_count ==0], na.rm = TRUE) # 41 values
+
+ggplot(barstool2) +
+  geom_dotplot(aes(x = price_level, y = dave_avg, color = comm_count > 0, fill = comm_count >0), binaxis='y', stackdir='center', dotsize=0.5) +
+  geom_hline(yintercept = c(comm_scored_med, comm_NOTscored_med), color = c("black", "red"), linetype = "dashed") +
+  geom_text(x = 0.6, y = comm_scored_med+0.5, label = comm_scored_med, size = 5, color = "black") +
+  geom_text(x = 0.6, y = comm_NOTscored_med+0.5, label = comm_NOTscored_med, size = 5, color = "red") +
+  scale_color_manual(values = c("red", "black")) +
+  scale_fill_manual(values = c("red", "black")) +
+  labs(x = "Price level", y = "Dave's score", title = "Dave's score", subtitle = "Each black point represents a pizza place also scored by community; red point = not scored \nHorizontal lines are Dave's median scores for pizza places scored (black) or not (red) by community ")
+```
+<font color="blue"> 
+It looks like the pizza places the community did NOT score tended to be the pizza places that weren't so good (based on Dave's scores). It's strange that Dave's median for the pizza places the community DID score is still the same as Dave's median overall (7.1, regardless of whether or not the community participated). I wonder if there were just a lot of pizza places that Dave scored that middle value (7.1), which then provides some buffer on the median score. </font>
+
+**Let's check that out...
+```{r how_many_7.1}
+sum(barstool2$dave_avg==7.1)
+```
+<font color="blue"> 
+Yes, there were 25 pizza places that Dave scored 7.1. There were only 41 pizza places that the community didn't score at all--and some of these were scored (by Dave) above 7.1. So it seems plausible that Dave's median score could still remain 7.1 when omitting the pizza places NOT scored by the community.</font>
+
+### Question: Is there a relationship between the number of community members who scored a pizza place, and the average community score for that place?
+I want to take a closer look at this relationship because it was a little difficult to see the pattern clearly in the other scatterplot
+```{r Q_commcount_vs_commavg}
+ggplot(barstool2, aes(x=comm_count, y=comm_avg)) + 
+  geom_point() +
+  labs(x = "Number of participating community members", y = "Average community score") +
+  theme_bw()
+```
+<font color="blue"> 
+Okay yes, there is a clear (non-linear) positive relationship between the number of people who scored a pizza place and the average score. That makes sense. Maybe people are more reluctant to give a bad score, so they tend to just give scores for the places they like. Or maybe it's just because more people go to the better pizza places, so there are more people available to provide a score.</font>
+
+### Question: Where ARE these pizza places? (click for name)
+For a last figure, let's just get a sense of where these pizza places are. I was going to color points by scores, but I've run out of time to figure this out :(
+```{r map}
+leaflet(data = barstool2) %>%
+  addTiles() %>%
+  setView(lng=median(barstool2$longitude, na.rm = TRUE), lat=median(barstool2$latitude, na.rm = TRUE), zoom=10) %>%
+  addMarkers(lng = ~longitude,
+             lat = ~latitude,
+             popup = ~name)
+```
