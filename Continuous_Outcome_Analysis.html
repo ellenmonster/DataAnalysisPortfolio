@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Ellen Cheng" />
+
+<meta name="date" content="2019-10-18" />
+
+<title>Continuous Outcome Analysis</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="customstyles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Analysis Exercise Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="./Continuous_Outcome_Analysis.html">Continuous Outcome Analysis</a>
+    </li>
+    <li class="dropdown-header">Future Analysis</li>
+  </ul>
+</li>
+<li>
+  <a href="./author.html">About the Author</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/epid8060fall2019/YangZhang_dataanalysis">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Continuous Outcome Analysis</h1>
+<h4 class="author">Ellen Cheng</h4>
+<h4 class="date">2019-10-18</h4>
+
+</div>
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">echo =</span> <span class="ot">TRUE</span>, <span class="dt">message =</span> <span class="ot">FALSE</span>, <span class="dt">warning =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div id="overview" class="section level1">
+<h1>Overview</h1>
+<p>This document will guide you through a few data analysis and model fitting tasks.</p>
+<p>Below, I provide commentary and instructions, and you are expected to write all or some of the missing code to perform the steps I describe.</p>
+<p>Note that I call the main data variable <code>d</code>. So if you see bits of code with that variable, it is the name of the data. You are welcome to give it different names, then just adjust the code snippets accordingly.</p>
+</div>
+<div id="project-setup" class="section level1">
+<h1>Project setup</h1>
+<p>We need a variety of different packages, which are loaded here. Install as needed. If you use others, load them here.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&#39;tidyr&#39;</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">library</span>(<span class="st">&#39;dplyr&#39;</span>)</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">library</span>(<span class="st">&#39;forcats&#39;</span>)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw">library</span>(<span class="st">&#39;ggplot2&#39;</span>)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="kw">library</span>(<span class="st">&#39;corrplot&#39;</span>) <span class="co">#to make a correlation plot. You can use other options/packages.</span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="kw">library</span>(<span class="st">&#39;visdat&#39;</span>) <span class="co">#for missing data visualization</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="kw">library</span>(<span class="st">&#39;caret&#39;</span>) <span class="co">#for model fitting</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="kw">library</span>(<span class="st">&#39;earth&#39;</span>)</a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="kw">library</span>(<span class="st">&#39;tidyverse&#39;</span>)</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="kw">rm</span>(<span class="dt">list=</span><span class="kw">ls</span>())</a></code></pre></div>
+</div>
+<div id="data-loading" class="section level1">
+<h1>Data loading</h1>
+<p>We will be exploring and fitting a dataset of norovirus outbreaks. You can look at the codebook, which briefly explains the meaning of each variable. If you are curious, you can check some previous papers that we published using (slighly different versions of) this dataset <a href="http://handelgroup.uga.edu/publication/devasia15epiinf/">here</a> and <a href="http://handelgroup.uga.edu/publication/desai2012cid/">here</a>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># I set &#39;results = &#39;hide&#39; just for this chunk because the output is too long</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">data_raw &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;norodata.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co"># glimpse(data_raw)</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="kw">summary</span>(data_raw)</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw">dim</span>(data_raw) <span class="co"># 1022 rows, 139 variables</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="kw">names</span>(data_raw)</a></code></pre></div>
+</div>
+<div id="data-exploration-and-cleaning" class="section level1">
+<h1>Data exploration and cleaning</h1>
+<div id="investigating-the-outcome-of-interest" class="section level2">
+<h2>Investigating the outcome of interest</h2>
+<p>Let’s assume that our main outcome of interest is the fraction of individuals that become infected in a given outbreak. The data reports that outcome (called <code>RateAll</code>), but we’ll also compute it ourselves so that we can practice creating new variables. To do so, take a look at the data (maybe peek at the Codebook) and decide which of the existing variables you should use to compute the new one. This new outcome variable will be added to the data frame.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># The codebook defines RateAll as: </span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co"># Attack rate (i.e. (secondary cases + primary cases/persons at risk)*100) from outbreak. # # I&#39;m assuming that there should be parentheses around &#39;secondary cases + primary cases&#39;. # # Relevant variables are: Cases1, Cases2, RiskAll? </span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co"># Or do I need to divide primary cases by Risk1 and secondary by Risk2?</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co"># Examine Risk1, Risk2, RiskAll to get a better idea of what they are</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7">(data_raw[, <span class="kw">c</span>(<span class="st">&quot;Risk1&quot;</span>, <span class="st">&quot;Risk2&quot;</span>, <span class="st">&quot;RiskAll&quot;</span>)])</a></code></pre></div>
+<pre><code>## # A tibble: 1,022 x 3
+##    Risk1 Risk2 RiskAll
+##    &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1   0      NA     0  
+##  2 108      NA   108  
+##  3 130      NA   130  
+##  4   4      NA     4  
+##  5  25      NA    25  
+##  6   8      NA     8  
+##  7  48      NA    48  
+##  8  12      NA    12  
+##  9 220      NA   220  
+## 10  71.4    NA    71.4
+## # … with 1,012 more rows</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># It looks like Risk2 is almost all NA&#39;s</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co"># Check the number of times they sum &#39;correctly&#39;--this took a bit of trial-and-error. </span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co"># Because of the NA&#39;s in Risk2, I found I couldn&#39;t simply use &#39;Risk1 + Risk2&#39; and had to use &#39;sum(...na.rm = TRUE)&#39; instead. </span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co"># Then discovered after Googling that I also had to include the &#39;rowwise()&#39; function so dplyr would sum row-by-row</span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6">match_vec &lt;-<span class="st"> </span>data_raw <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="st">  </span><span class="kw">rowwise</span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(<span class="dt">MatchRisk =</span> <span class="kw">sum</span>(Risk1, Risk2, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">==</span><span class="st"> </span>RiskAll) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># had to use &#39;sum&#39; to deal with the NA&#39;s</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># to negate rowwise()</span></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="st">  </span><span class="kw">pull</span>(MatchRisk)</a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="kw">table</span>(match_vec, <span class="dt">useNA =</span> <span class="st">&quot;always&quot;</span>) </a></code></pre></div>
+<pre><code>## match_vec
+## TRUE &lt;NA&gt; 
+##  902  120</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># TRUE = 902 and NA = 120. That adds up correctly to the 1022 data records. </span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># Here, NA = 120 is the number of records in which both Risk1 and Risk2 are NA?? </span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co"># Let&#39;s check...</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">(data_raw <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="st">    </span><span class="kw">filter</span>(<span class="kw">is.na</span>(Risk1) <span class="op">&amp;</span><span class="st"> </span><span class="kw">is.na</span>(Risk2)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="st">    </span><span class="kw">select</span>(Risk1, Risk2, RiskAll)) <span class="co"># hmmm...nothing</span></a></code></pre></div>
+<pre><code>## # A tibble: 0 x 3
+## # … with 3 variables: Risk1 &lt;dbl&gt;, Risk2 &lt;dbl&gt;, RiskAll &lt;dbl&gt;</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">(data_raw[<span class="kw">which</span>(<span class="kw">is.na</span>(match_vec)), <span class="kw">c</span>(<span class="st">&quot;Risk1&quot;</span>, <span class="st">&quot;Risk2&quot;</span>, <span class="st">&quot;RiskAll&quot;</span>)]) </a></code></pre></div>
+<pre><code>## # A tibble: 120 x 3
+##    Risk1 Risk2 RiskAll
+##    &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+##  1     0    NA      NA
+##  2     0    NA      NA
+##  3     0    NA      NA
+##  4     0    NA      NA
+##  5     0    NA      NA
+##  6     0    NA      NA
+##  7     0    NA      NA
+##  8     0    NA      NA
+##  9     0    NA      NA
+## 10     0    NA      NA
+## # … with 110 more rows</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># Oh, so these are all records in which Risk1 = 0 and Risk2 = NA</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co"># Now to the task at hand, which is to manually calculate RateAll as a variable called &#39;fracinf&#39;. </span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co"># Just to stick with the capitalization format used in t data_raw, I&#39;ll call it &#39;FracInf&#39;</span></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6">d &lt;-<span class="st"> </span>data_raw <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(<span class="dt">FracInf =</span> ((Cases1 <span class="op">+</span><span class="st"> </span>Cases2)<span class="op">/</span>RiskAll) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>) </a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co"># Note that there will be some funny results when RiskAll is NA</span></a>
+<a class="sourceLine" id="cb12-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb12-11" data-line-number="11">(d <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Cases1, Cases2, Risk1, Risk2, RiskAll, FracInf, RateAll)) </a></code></pre></div>
+<pre><code>## # A tibble: 1,022 x 7
+##    Cases1 Cases2 Risk1 Risk2 RiskAll FracInf RateAll
+##     &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1     15     NA   0      NA     0      NA       0  
+##  2     43     22 108      NA   108      60.2    39.8
+##  3     27     NA 130      NA   130      NA      20.8
+##  4      4     NA   4      NA     4      NA     100  
+##  5     15     NA  25      NA    25      NA      60  
+##  6      6     NA   8      NA     8      NA      75  
+##  7     40     NA  48      NA    48      NA      83.3
+##  8     10     NA  12      NA    12      NA      83.3
+##  9    116     NA 220      NA   220      NA      54.2
+## 10     45     NA  71.4    NA    71.4    NA      63  
+## # … with 1,012 more rows</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># WHOOPS! Clearly I did that wrong. </span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="co"># So it looks like the equation should be: ((Cases1/Risk1) + (Cases2/Risk2)) * 100. </span></a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="co"># I guess that makes more sense anyway. Try again...</span></a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb14-5" data-line-number="5">d &lt;-<span class="st"> </span>data_raw <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-6" data-line-number="6"><span class="st">  </span><span class="kw">rowwise</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-7" data-line-number="7"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(<span class="dt">FracInf =</span> <span class="kw">sum</span>(Cases1<span class="op">/</span>Risk1, Cases2<span class="op">/</span>Risk2, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-8" data-line-number="8"><span class="st">  </span><span class="kw">ungroup</span>()</a>
+<a class="sourceLine" id="cb14-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb14-10" data-line-number="10">(d <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Cases1, Cases2, Risk1, Risk2, RiskAll, FracInf, RateAll))</a></code></pre></div>
+<pre><code>## # A tibble: 1,022 x 7
+##    Cases1 Cases2 Risk1 Risk2 RiskAll FracInf RateAll
+##     &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1     15     NA   0      NA     0     Inf       0  
+##  2     43     22 108      NA   108      39.8    39.8
+##  3     27     NA 130      NA   130      20.8    20.8
+##  4      4     NA   4      NA     4     100     100  
+##  5     15     NA  25      NA    25      60      60  
+##  6      6     NA   8      NA     8      75      75  
+##  7     40     NA  48      NA    48      83.3    83.3
+##  8     10     NA  12      NA    12      83.3    83.3
+##  9    116     NA 220      NA   220      52.7    54.2
+## 10     45     NA  71.4    NA    71.4    63.0    63  
+## # … with 1,012 more rows</code></pre>
+<div class="note">
+<p><strong>From here on, I’m using these yellow text boxes to highlight specific findings.</strong></p>
+<p>Okay, pretty good match! Issues:</p>
+<ul>
+<li><p>when ‘RateAll’ = 0, FracInf’ = Inf (this occurs when Risk1 and Risk2 are either 0 or NA and nothing else. SO THERE ARE ACTUALLY CASES, BUT JUST NO RISK)</p></li>
+<li><p>when ‘RateAll’ = NA, ‘FracInf’ = Inf (this also occurs when Risk1 and Risk2 are either 0 or NA and nothing else. AGAIN, THERE ARE ACTUALLY CASES, BUT JUST NO RISK. Not sure why RateAll is NA in these cases, instead of 0–but I do note that RiskAll is NA in these cases, whereas it was 0 in the other cases. SO THE RATEALL CALC MUST BE USING RISKALL INSTEAD OF HOW I CALCULATED IT FROM RISK1 AND RISK2??)</p></li>
+<li><p>when ‘RateAll’ = NA, ‘FracInf’ = 0 (this occurs when Cases1 = Cases2 = NA. Well that’s weird, not sure why those records are even in there. I SHOULD NOT USE THESE RECORDS)</p></li>
+<li>when ‘RateAll’ is a number and ‘FracInf’ = Inf (this occurs when Risk1 and Risk2 are either 0 or NA and nothing else. I don’t understand how they got a value for RateAll in these cases–maybe manually entered instead of using the data)</li>
+</ul>
+</div>
+<div class="fyi">
+<p><strong>From here on, I’m using these blue text boxes to summarize general discoveries and ‘notes to self’.</strong></p>
+<p>A few notes summarizing we know so far:</p>
+<ul>
+<li><p>In the codebook, ‘RateAll’ is defined as: Attack rate (i.e. (secondary cases + primary cases/persons at risk) X 100). I found that a bit confusing as written. I tested a couple approaches, and it seems that the equation is: Attack rate = ((primary cases/primary risk) + (secondary cases/secondary risk)) X 100</p></li>
+<li><p>Even if I got the equation correct (which I’m hoping I did), we see some discrepancies between ‘FracInf’ (my calculation) and ‘RateAll’. These seem to stem primarily from records where there were no cases (these should be removed) or there were cases but zero risk (not sure what to do with these).</p></li>
+<li><p>I noted that another way to calculate ‘FracInf’ would be as ‘CasesAll/RiskAll’, but when I did that I got a different answer from ‘RateAll’ sometimes. Specifically, when Cases1, Cases2, and Risk1 all have numbers but Risk2 = NA, then my ‘FracInc’ matched the reported ‘RateAll’, but if I had calculated it as ‘(CasesAll/RiskAll) * 100’ I would have gotten a number different from the ‘RateAll’.</p></li>
+<li>Notes for future reference: 1) when summing values with ‘+’, if one of the values is NA the sum will be NA. Therefore, use ‘sum(…, na.rm = TRUE); 2) in dplyr, when trying to create a new variable by summing existing variables, use the function ’rowwise()’ to make sure it sums row-by-row. There also seems to be a ‘rowSums’ function, but it only seems to work under certain conditions; 3) these colored text boxes are really cool, keep this in mind for future work.</li>
+</ul>
+</div>
+<p>Use both text summaries and plots to take a look at the new variable you created to see if everything looks ok or if we need further cleaning.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">d_select &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Cases1, Cases2, Risk1, Risk2, RiskAll, FracInf, RateAll) <span class="co"># Focus on these columns for now</span></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="kw">summary</span>(d_select)</a></code></pre></div>
+<pre><code>##      Cases1            Cases2            Risk1              Risk2       
+##  Min.   :    1.0   Min.   :   1.00   Min.   :    0.00   Min.   : 66.00  
+##  1st Qu.:    9.0   1st Qu.:   4.25   1st Qu.:    0.00   1st Qu.: 72.25  
+##  Median :   26.0   Median :  10.50   Median :   10.00   Median : 82.00  
+##  Mean   :  125.2   Mean   :  53.02   Mean   :  374.57   Mean   :135.06  
+##  3rd Qu.:   64.5   3rd Qu.:  26.75   3rd Qu.:   95.75   3rd Qu.:210.59  
+##  Max.   :32150.0   Max.   :1113.00   Max.   :35000.00   Max.   :258.00  
+##  NA&#39;s   :7         NA&#39;s   :976                          NA&#39;s   :1014    
+##     RiskAll           FracInf         RateAll      
+##  Min.   :    0.0   Min.   : 0.00   Min.   :  0.00  
+##  1st Qu.:    0.0   1st Qu.:31.33   1st Qu.:  0.00  
+##  Median :   22.5   Median :76.92   Median : 15.28  
+##  Mean   :  425.6   Mean   :  Inf   Mean   : 26.65  
+##  3rd Qu.:  119.5   3rd Qu.:  Inf   3rd Qu.: 48.91  
+##  Max.   :35000.0   Max.   :  Inf   Max.   :105.00  
+##  NA&#39;s   :120                       NA&#39;s   :108</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="co"># Table of oddities. These are cases where either/or/both &#39;RateAll&#39; and &#39;FracInf&#39; have NA, Inf, or 0</span></a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">d_select <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(<span class="dt">FracInf_categ =</span> <span class="kw">ifelse</span>(<span class="kw">is.na</span>(FracInf), <span class="st">&quot;NA&quot;</span>, <span class="kw">ifelse</span>(<span class="kw">is.infinite</span>(FracInf), <span class="st">&quot;Inf&quot;</span>, <span class="kw">ifelse</span>(FracInf <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;0&quot;</span>, <span class="st">&quot;number&quot;</span>))),</a>
+<a class="sourceLine" id="cb18-4" data-line-number="4">                <span class="dt">RateAll_categ =</span> <span class="kw">ifelse</span>(<span class="kw">is.na</span>(RateAll), <span class="st">&quot;NA&quot;</span>, <span class="kw">ifelse</span>(<span class="kw">is.infinite</span>(RateAll), <span class="st">&quot;Inf&quot;</span>, <span class="kw">ifelse</span>(RateAll <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;0&quot;</span>, <span class="st">&quot;number&quot;</span>)))) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="st">  </span><span class="kw">select</span>(FracInf_categ, RateAll_categ) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="st">  </span><span class="kw">table</span>()</a></code></pre></div>
+<pre><code>##              RateAll_categ
+## FracInf_categ   0  NA number
+##        0        0   7      0
+##        Inf    323 101     12
+##        number   0   0    579</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># It looks like there are 579 cases where both variables actually have a number that is not zero.</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="co"># looked at those 579 cases and the numbers are pretty close except in one case (see note in yellow box below).</span></a>
+<a class="sourceLine" id="cb20-3" data-line-number="3">                </a>
+<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co"># Density histograms of &#39;FracInf&#39; and RateAll&#39;. Convert to long format.</span></a>
+<a class="sourceLine" id="cb20-5" data-line-number="5">d_select <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="st">  </span><span class="kw">select</span>(FracInf, RateAll) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="st">  </span><span class="kw">gather</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb20-8" data-line-number="8"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-9" data-line-number="9"><span class="st">  </span><span class="kw">geom_density</span>(<span class="kw">aes</span>(value, <span class="dt">color =</span> key))</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/checkdata-1.png" width="672" /></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co"># Got a warning: Removed 544 rows containing non-finite values (stat_density).</span></a>
+<a class="sourceLine" id="cb21-2" data-line-number="2"><span class="co"># Let&#39;s try it with just the records where both variables actually have a number, so it&#39;s a more fair comparison</span></a>
+<a class="sourceLine" id="cb21-3" data-line-number="3">(d_select_compl &lt;-<span class="st"> </span>d_select <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="st">    </span><span class="kw">select</span>(FracInf, RateAll) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="st">    </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(FracInf) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(RateAll)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="st">    </span><span class="kw">filter</span>(<span class="kw">is.finite</span>(FracInf) <span class="op">&amp;</span><span class="st"> </span><span class="kw">is.finite</span>(RateAll)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="st">  </span><span class="kw">gather</span>()) <span class="co"># save this in a variable for later summaries</span></a></code></pre></div>
+<pre><code>## # A tibble: 1,158 x 2
+##    key     value
+##    &lt;chr&gt;   &lt;dbl&gt;
+##  1 FracInf  39.8
+##  2 FracInf  20.8
+##  3 FracInf 100  
+##  4 FracInf  60  
+##  5 FracInf  75  
+##  6 FracInf  83.3
+##  7 FracInf  83.3
+##  8 FracInf  52.7
+##  9 FracInf  63.0
+## 10 FracInf  37.5
+## # … with 1,148 more rows</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">d_select_compl <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb23-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb23-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_density</span>(<span class="kw">aes</span>(value, <span class="dt">color =</span> key))</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/checkdata-2.png" width="672" /></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co"># When we look at only the cases where both have a number reported, the histograms are almost identical and very oddly shaped</span></a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="co"># Let&#39;s try a violin plot of the data</span></a>
+<a class="sourceLine" id="cb24-4" data-line-number="4">d_select_compl <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb24-5" data-line-number="5"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> key, <span class="dt">y =</span> value, <span class="dt">color =</span> key)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb24-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_violin</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb24-7" data-line-number="7"><span class="st">  </span><span class="kw">geom_jitter</span>()</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/checkdata-3.png" width="672" /></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="co"># Looks like pop bottles</span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="co"># We see a string of value = 100 for both variables. And also a value &gt; 100.</span></a>
+<a class="sourceLine" id="cb25-3" data-line-number="3">(d_select <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb25-4" data-line-number="4"><span class="st">  </span><span class="kw">filter</span>(<span class="kw">is.finite</span>(FracInf) <span class="op">&amp;</span><span class="st"> </span><span class="kw">is.finite</span>(RateAll)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># only way to get rid of Inf</span></a>
+<a class="sourceLine" id="cb25-5" data-line-number="5"><span class="st">  </span><span class="kw">filter</span>(FracInf <span class="op">&gt;=</span><span class="st"> </span><span class="dv">100</span> <span class="op">|</span><span class="st"> </span>RateAll <span class="op">&gt;=</span><span class="st"> </span><span class="dv">100</span>))</a></code></pre></div>
+<pre><code>## # A tibble: 38 x 7
+##    Cases1 Cases2 Risk1 Risk2 RiskAll FracInf RateAll
+##     &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1      4     NA     4    NA       4     100     100
+##  2      2     NA     2    NA       2     100     100
+##  3      3     NA     3    NA       3     100     100
+##  4      2     NA     2    NA       2     100     100
+##  5      5     NA     5    NA       5     100     100
+##  6      2     NA     2    NA       2     100     100
+##  7      6     NA     6    NA       6     100     100
+##  8      3     NA     3    NA       3     100     100
+##  9      2     NA     2    NA       2     100     100
+## 10      2     NA     2    NA       2     100     100
+## # … with 28 more rows</code></pre>
+<div class="note">
+<ul>
+<li><p>There is one record where ‘RateAll’ = 1 and ‘FracInf’ = 0.399. In that record, there are only primary cases (‘Cases1’ = 40 and ‘Risk1’ = 10013). It seems ‘RateAll’ is incorrect.</p></li>
+<li><p>There are 579 records where both ‘RateAll’ and ‘FracInf’ have a number.</p></li>
+<li><p>There are no records where one variable has zero and the other variable has a number.</p></li>
+<li>There is an unusual number of records where the rate is 100. In all these cases, Case1 = Risk1 and there are no values for Case2 or Risk2. I wonder if there was a misunderstanding by the people entering the data records–perhaps they thought the number at risk also included the person who actually had the virus (i.e., ‘Risk’ = ‘Cases’ + any one else also at risk from the cases. Otherwise, it seems odd to suddenly see a string of rates equal 100.</li>
+</ul>
+</div>
+<div class="fyi">
+<ul>
+<li>The distribution of data is clearly non-normal and–when only comparing records where both ‘FracInf’ and ‘RateAll’ have numbers–nearly identical for the two variables</li>
+</ul>
+</div>
+<p>We notice there are NAs in this variable and the distribution is not normal. The latter is somewhat expected since our variable is a proportion, so it has to be between 0 and 1. There are also a lot of infinite values. Understand where they come from.</p>
+<p>Let’s take a look at the <code>RateAll</code> variable recorded in the dataset and compare it to ours. First, create a plot that lets you quickly see if/how the variables differ.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="co"># Plot one variable on the x axis, the other on the y axis</span></a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"> d_select <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb27-3" data-line-number="3"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> RateAll, <span class="dt">y =</span> FracInf)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb27-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb27-5" data-line-number="5"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/checkoutcome-1.png" width="672" /></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="co"># also plot the difference of the 2 variables</span></a>
+<a class="sourceLine" id="cb28-2" data-line-number="2">d_select <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(<span class="dt">Diff =</span> RateAll <span class="op">-</span><span class="st"> </span>FracInf) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb28-4" data-line-number="4"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(Diff)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb28-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_histogram</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb28-6" data-line-number="6"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&quot;Difference Between RateAll and FracInf&quot;</span>, <span class="dt">x =</span> <span class="st">&quot;RateAll - FracInf&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb28-7" data-line-number="7"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/checkoutcome-2.png" width="672" /></p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="co"># Note when either variable is NA or Inf, the difference is NA or Inf</span></a>
+<a class="sourceLine" id="cb29-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb29-3" data-line-number="3"><span class="co"># make sure you adjust so both are in the same units</span></a>
+<a class="sourceLine" id="cb29-4" data-line-number="4"><span class="co"># I&#39;M NOT SURE WHAT THE REMINDER ABOVE MEANS...IT SEEMS THEY ARE ALREADY IN THE SAME UNIT?</span></a></code></pre></div>
+<p>Both ways of plotting the data show that for most outbreaks, the two ways of getting the outcome agree. So that’s good. But we need to look closer and resolve the problem with infinite values above. Check to see what the <code>RateAll</code> variable has for those infinite values.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="co"># Write code that looks at the values of RateAll where we have inifinite values.</span></a>
+<a class="sourceLine" id="cb30-2" data-line-number="2"><span class="co"># I&#39;m repeating an earlier table, but only for records where FracInf = INF</span></a>
+<a class="sourceLine" id="cb30-3" data-line-number="3">(d_select <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb30-4" data-line-number="4"><span class="st">   </span><span class="kw">filter</span>(<span class="kw">is.infinite</span>(FracInf)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb30-5" data-line-number="5"><span class="st">   </span><span class="kw">mutate</span>(<span class="dt">RateAll_categ =</span> <span class="kw">ifelse</span>(<span class="kw">is.na</span>(RateAll), <span class="st">&quot;NA&quot;</span>, <span class="kw">ifelse</span>(<span class="kw">is.infinite</span>(RateAll), <span class="st">&quot;Inf&quot;</span>, <span class="kw">ifelse</span>(RateAll <span class="op">==</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;0&quot;</span>, <span class="st">&quot;number&quot;</span>)))) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb30-6" data-line-number="6"><span class="st">  </span><span class="kw">count</span>(RateAll_categ))</a></code></pre></div>
+<pre><code>## # A tibble: 3 x 2
+##   RateAll_categ     n
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 0               323
+## 2 NA              101
+## 3 number           12</code></pre>
+<div class="note">
+<p>In records where FracInf is INF,</p>
+<ul>
+<li><p>there are 323 cases where ‘RateAll’ is 0</p></li>
+<li>Dr. Handel said that all ‘RateAll’ values should be 0 where ‘FracInf’ is INF, but I also have 101 cases where ‘RateAll’ is NA and 12 cases where ‘RateAll’ is a number. Hmmm… hope I didn’t do something wrong…</li>
+</ul>
+</div>
+<p>You should find that all of the reported values are 0. So what makes more sense? You should have figured out that the infinite values in our computed variables arise because the <code>RiskAll</code> variable is 0. That variable contains the total number of persons at risk for an outbreak. If nobody is at risk of getting infected, of course, we can’t get any infected. So <code>RateAll</code> being 0 is technically correct. But does it make sense to include “outbreaks” in our analysis where nobody is at risk of getting infected? One should question how those got into the spreadsheet in the first place.</p>
+<p><strong>Having to deal with “weirdness” in your data like this example is common. You often need to make a decision based on best judgment.</strong></p>
+<p>Here, I think that if nobody is at risk, we shouldn’t include those outbreaks in further analysis. Thus, we’ll go with our computed outcome and remove all observations that have missing or infinite values for the outcome of interest, since those can’t be used for model fitting. Thus, we go ahead and remove any observations that have un-useable values in the outcome.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="co"># Write code that removes all observations that have an outcome that is not very useful, i.e. either NA or infinity. Then look at the outcome variable again to make sure things are fixed. Also check the size of the new dataset to see by how much it shrunk.</span></a>
+<a class="sourceLine" id="cb32-2" data-line-number="2">dat_temp &lt;-<span class="st"> </span>d_select_compl &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="st">    </span><span class="kw">filter</span>(<span class="kw">is.finite</span>(FracInf) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(FracInf))</a>
+<a class="sourceLine" id="cb32-4" data-line-number="4"><span class="kw">dim</span>(dat_temp)</a></code></pre></div>
+<pre><code>## [1] 586 140</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">dat_temp2 &lt;-<span class="st"> </span>dat_temp <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb34-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(FracInf <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) </a>
+<a class="sourceLine" id="cb34-3" data-line-number="3">(dat_temp2[, <span class="kw">c</span>(<span class="st">&quot;FracInf&quot;</span>, <span class="st">&quot;RateAll&quot;</span>)])</a></code></pre></div>
+<pre><code>## # A tibble: 579 x 2
+##    FracInf RateAll
+##      &lt;dbl&gt;   &lt;dbl&gt;
+##  1    39.8    39.8
+##  2    20.8    20.8
+##  3   100     100  
+##  4    60      60  
+##  5    75      75  
+##  6    83.3    83.3
+##  7    83.3    83.3
+##  8    52.7    54.2
+##  9    63.0    63  
+## 10    37.5    37.5
+## # … with 569 more rows</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="kw">dim</span>(dat_temp2)</a></code></pre></div>
+<pre><code>## [1] 579 140</code></pre>
+<div class="note">
+<p>When I removed all cases where ‘FracInf’ = INF or NA (there were actually no cases where it was NA, I think, but just in case), I was left with 586 records. When I also removed the 7 records where ‘FracInc’ = 0 (‘RateAll’ = NA in these records), I was left with 579 observations. That matches what Dr. Handel said we should have, so hopefully I’m on the same page with everyone else by now.</p>
+</div>
+<p>You should find that we lost a lot of data, we are down to 579 observations (from a starting 1022). That would be troublesome for most studies if that would mean subjects drop out (that could lead to bias). Here it’s maybe less problematic since each observation is an outbreak collected from the literature. Still, dropping this many could lead to bias if all the ones that had NA or Infinity were somehow systematically different. It would be useful to look into and discuss in a real analysis.</p>
+</div>
+<div id="wrangling-the-predictors" class="section level2">
+<h2>Wrangling the predictors</h2>
+<p>Not uncommon for real datasets, this one has a lot of variables. Many are not too meaningful for modeling. Our question is what predicts the fraction of those that get infected, i.e., the new outcome we just created. We should first narrow down the predictor variables of interest <em>based on scientific grounds.</em></p>
+<p>For this analysis exercise, we just pick the following variables for further analysis: <code>Action1, CasesAll, Category, Country, Deaths, GG2C4, Hemisphere, Hospitalizations</code>, <code>MeanA1, MeanD1, MeanI1, MedianA1, MedianD1, MedianI1</code>, <code>OBYear, Path1, RiskAll, Season, Setting, Trans1, Vomit.</code> Of course, we also need to keep our outcome of interest.</p>
+<p>Note that - as often happens for real data - there are inconsistencies between the codebook and the actual datasheet. Here, names of variables and spelling in the codebook do not fully agree with the data. The above list of variables is based on codebook, and you need to make sure you get the right names from the data when selecting those variables.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1">dat_temp3 &lt;-<span class="st"> </span>dat_temp2 <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb38-2" data-line-number="2"><span class="st">  </span><span class="kw">select</span>(FracInf, Action1, CasesAll, Category, Country, Deaths, gg2c4, Hemisphere, Hospitalizations, MeanA1, MeanD1, MeanI1, MedianA1, MedianD1, MedianI1, OBYear, Path1, RiskAll, season, Setting_<span class="dv">1</span>, Trans1, Vomit) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb38-3" data-line-number="3"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">Season =</span> season, <span class="dt">GG2C4 =</span> gg2c4)</a>
+<a class="sourceLine" id="cb38-4" data-line-number="4"><span class="kw">dim</span>(dat_temp3)</a></code></pre></div>
+<pre><code>## [1] 579  22</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="kw">names</span>(dat_temp3)</a></code></pre></div>
+<pre><code>##  [1] &quot;FracInf&quot;          &quot;Action1&quot;          &quot;CasesAll&quot;        
+##  [4] &quot;Category&quot;         &quot;Country&quot;          &quot;Deaths&quot;          
+##  [7] &quot;GG2C4&quot;            &quot;Hemisphere&quot;       &quot;Hospitalizations&quot;
+## [10] &quot;MeanA1&quot;           &quot;MeanD1&quot;           &quot;MeanI1&quot;          
+## [13] &quot;MedianA1&quot;         &quot;MedianD1&quot;         &quot;MedianI1&quot;        
+## [16] &quot;OBYear&quot;           &quot;Path1&quot;            &quot;RiskAll&quot;         
+## [19] &quot;Season&quot;           &quot;Setting_1&quot;        &quot;Trans1&quot;          
+## [22] &quot;Vomit&quot;</code></pre>
+<p>Your reduced dataset should contain 579 observations and 22 variables.</p>
+<p>With this reduced dataset, we’ll likely still need to perform further cleaning. We can start by looking at missing data. While the <code>summary</code> function gives that information, it is somewhat tedious to pull out. We can just focus on NA for each variable and look at the text output, or for lots of predictors, a graphical view is easier to understand. The latter has the advantage of showing potential clustering of missing values.</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="co"># this code prints number of missing for each variable (assuming your dataframe is called d)</span></a>
+<a class="sourceLine" id="cb42-2" data-line-number="2"><span class="kw">print</span>(<span class="kw">colSums</span>(<span class="kw">is.na</span>(dat_temp3))) </a></code></pre></div>
+<pre><code>##          FracInf          Action1         CasesAll         Category 
+##                0                0                0                0 
+##          Country           Deaths            GG2C4       Hemisphere 
+##                0               25              400                0 
+## Hospitalizations           MeanA1           MeanD1           MeanI1 
+##               25              553                0                0 
+##         MedianA1         MedianD1         MedianI1           OBYear 
+##              541                0                0                0 
+##            Path1          RiskAll           Season        Setting_1 
+##                0                0               40                0 
+##           Trans1            Vomit 
+##                0                1</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="co"># See my note below--In all cases where GG2C4 is NA, I&#39;m changing them to &quot;No&quot; because the codebook says that if it&#39;s no then it&#39;s left blank. </span></a>
+<a class="sourceLine" id="cb44-2" data-line-number="2"><span class="co"># When importing the data, blanks are converted to NA unless otherwise specified.</span></a>
+<a class="sourceLine" id="cb44-3" data-line-number="3"><span class="co"># For all other variables, blanks really are NA, so I want those to be converted to NA.</span></a>
+<a class="sourceLine" id="cb44-4" data-line-number="4"><span class="kw">unique</span>(dat_temp3<span class="op">$</span>GG2C4) <span class="co"># First, confirm that there are no entries of &#39;No&#39;</span></a></code></pre></div>
+<pre><code>## [1] NA    &quot;Yes&quot;</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1">dat_temp3<span class="op">$</span>GG2C4[<span class="kw">is.na</span>(dat_temp3<span class="op">$</span>GG2C4)] &lt;-<span class="st"> &quot;No&quot;</span></a>
+<a class="sourceLine" id="cb46-2" data-line-number="2"><span class="kw">table</span>(dat_temp3<span class="op">$</span>GG2C4)</a></code></pre></div>
+<pre><code>## 
+##  No Yes 
+## 400 179</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="co"># write code to use the visdat R package, add code that plots a heatmap of missing values </span></a>
+<a class="sourceLine" id="cb48-2" data-line-number="2"><span class="kw">vis_miss</span>(dat_temp3, <span class="dt">sort_miss =</span> <span class="ot">TRUE</span>) <span class="co"># Sorted by missingness</span></a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/check-reduced-data-1.png" width="672" /></p>
+<div class="note">
+<p>YIKES!! I wonder if I’m working with a different dataset or if I did something wrong. In my data, I also have 400 NA’s for GG2C4 and a small number of NA’s for some of the other variables [UPDATE: I just checked the codebook and it says ‘if no strain in the outbreak is GII.4 then GG2C4 is left blank’. It seems that when I read in the data, these were all converted to NA’s –actually, they should be entered as “No”. For all other variables, when fields were left blank they were truly NA. As a general practice, data forms should not allow blanks that mean something other than NA. For now, I’m converting all NA’s in GG2C4 to ‘No’, so I can do this exercise (I HOPE THIS ASSUMPTION IS CORRECT–IN REAL LIFE, I WOULD CONTACT THE AUTHOR BEFORE MAKING SUCH CHANGES)]</p>
+</div>
+<div class="fyi">
+<p>‘visdat’ is a really neat package that does graphics that I have spent a lot of time doing manually in the past–keep in mind for future projects</p>
+</div>
+<p>It looks like we have a lot of missing data for the <code>MeanA1</code> and <code>MedianA1</code> variables. If we wanted to keep those variables, we would be left with very few observations. So let’s drop those two variables. After that, we will drop all observations that have missing data (seems to be <code>Hospitalization</code> and <code>Deaths</code>).</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="co"># write code to remove the 2 &quot;A1&quot; variables, then drop all remaining observations with NA</span></a>
+<a class="sourceLine" id="cb49-2" data-line-number="2">dat_temp4 &lt;-<span class="st"> </span>dat_temp3 <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb49-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>MeanA1, <span class="op">-</span>MedianA1)</a>
+<a class="sourceLine" id="cb49-4" data-line-number="4"><span class="co"># glimpse(dat_temp4)</span></a>
+<a class="sourceLine" id="cb49-5" data-line-number="5"><span class="co"># Season, Setting_2, and Vomit also had missing cases</span></a>
+<a class="sourceLine" id="cb49-6" data-line-number="6">dat_temp5 &lt;-<span class="st"> </span>dat_temp4[<span class="kw">complete.cases</span>(dat_temp4),]</a>
+<a class="sourceLine" id="cb49-7" data-line-number="7"><span class="kw">dim</span>(dat_temp5)</a></code></pre></div>
+<pre><code>## [1] 513  20</code></pre>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="kw">summary</span>(dat_temp5)</a></code></pre></div>
+<pre><code>##     FracInf           Action1             CasesAll      
+##  Min.   :  0.4074   Length:513         Min.   :   1.00  
+##  1st Qu.: 17.7419   Class :character   1st Qu.:   7.00  
+##  Median : 39.2405   Mode  :character   Median :  20.00  
+##  Mean   : 42.1419                      Mean   :  89.36  
+##  3rd Qu.: 61.1111                      3rd Qu.:  60.00  
+##  Max.   :104.7770                      Max.   :7150.00  
+##    Category           Country              Deaths       
+##  Length:513         Length:513         Min.   :0.00000  
+##  Class :character   Class :character   1st Qu.:0.00000  
+##  Mode  :character   Mode  :character   Median :0.00000  
+##                                        Mean   :0.07212  
+##                                        3rd Qu.:0.00000  
+##                                        Max.   :9.00000  
+##     GG2C4            Hemisphere        Hospitalizations      MeanD1      
+##  Length:513         Length:513         Min.   : 0.0000   Min.   : 0.000  
+##  Class :character   Class :character   1st Qu.: 0.0000   1st Qu.: 0.000  
+##  Mode  :character   Mode  :character   Median : 0.0000   Median : 0.000  
+##                                        Mean   : 0.6959   Mean   : 1.954  
+##                                        3rd Qu.: 0.0000   3rd Qu.: 0.000  
+##                                        Max.   :99.0000   Max.   :96.000  
+##      MeanI1           MedianD1         MedianI1         OBYear         
+##  Min.   : 0.0000   Min.   : 0.000   Min.   : 0.000   Length:513        
+##  1st Qu.: 0.0000   1st Qu.: 0.000   1st Qu.: 0.000   Class :character  
+##  Median : 0.0000   Median : 0.000   Median : 0.000   Mode  :character  
+##  Mean   : 0.9259   Mean   : 3.462   Mean   : 2.277                     
+##  3rd Qu.: 0.0000   3rd Qu.: 0.000   3rd Qu.: 0.000                     
+##  Max.   :43.0000   Max.   :72.000   Max.   :65.000                     
+##     Path1              RiskAll           Season         
+##  Length:513         Min.   :    1.0   Length:513        
+##  Class :character   1st Qu.:   23.0   Class :character  
+##  Mode  :character   Median :   74.0   Mode  :character  
+##                     Mean   :  504.6                     
+##                     3rd Qu.:  220.0                     
+##                     Max.   :24000.0                     
+##   Setting_1            Trans1              Vomit      
+##  Length:513         Length:513         Min.   :0.000  
+##  Class :character   Class :character   1st Qu.:0.000  
+##  Mode  :character   Mode  :character   Median :1.000  
+##                                        Mean   :0.575  
+##                                        3rd Qu.:1.000  
+##                                        Max.   :1.000</code></pre>
+<p>Let’s now check the format of each variable. Depending on how you loaded the data, some variables might not be in the right format. Make sure everything that should be numeric is numeric/integer, everything that should be a factor is a factor. There should be no variable coded as <code>character</code>. Once all variables have the right format, take a look at the data again.</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="co"># write code to format variables as needed</span></a>
+<a class="sourceLine" id="cb53-2" data-line-number="2"><span class="co"># glimpse(dat_temp4)</span></a>
+<a class="sourceLine" id="cb53-3" data-line-number="3"><span class="co"># OBYear should be a factor, I think?</span></a>
+<a class="sourceLine" id="cb53-4" data-line-number="4"><span class="co"># Vomit should be a factor (the only possible values are -1, 0, 1 and they stand for different categories)</span></a>
+<a class="sourceLine" id="cb53-5" data-line-number="5"><span class="co"># After those changes, all character variables can be converted to factor</span></a>
+<a class="sourceLine" id="cb53-6" data-line-number="6"><span class="co"># Some of the numeric variables are probably really limited to integers, but I&#39;ll keep them as numeric just to be safe</span></a>
+<a class="sourceLine" id="cb53-7" data-line-number="7">dat_temp5<span class="op">$</span>OBYear &lt;-<span class="st"> </span><span class="kw">factor</span>(dat_temp5<span class="op">$</span>OBYear)</a>
+<a class="sourceLine" id="cb53-8" data-line-number="8">dat_temp5<span class="op">$</span>Vomit &lt;-<span class="st"> </span><span class="kw">factor</span>(dat_temp5<span class="op">$</span>Vomit)</a>
+<a class="sourceLine" id="cb53-9" data-line-number="9">dat_temp5 &lt;-<span class="st"> </span>dat_temp5 <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb53-10" data-line-number="10"><span class="st">  </span><span class="kw">mutate_if</span>(is.character, as.factor)</a>
+<a class="sourceLine" id="cb53-11" data-line-number="11"><span class="co"># glimpse(dat_temp5)</span></a>
+<a class="sourceLine" id="cb53-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb53-13" data-line-number="13"><span class="kw">levels</span>(dat_temp5<span class="op">$</span>OBYear) </a></code></pre></div>
+<pre><code>##  [1] &quot;0&quot;    &quot;1983&quot; &quot;1990&quot; &quot;1993&quot; &quot;1994&quot; &quot;1995&quot; &quot;1996&quot; &quot;1997&quot; &quot;1998&quot; &quot;1999&quot;
+## [11] &quot;2000&quot; &quot;2001&quot; &quot;2002&quot; &quot;2003&quot; &quot;2004&quot; &quot;2005&quot; &quot;2006&quot; &quot;2007&quot; &quot;2008&quot; &quot;2009&quot;
+## [21] &quot;2010&quot;</code></pre>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="co"># Make sure the years are in correct order. Weird, there are also years of 0. Seems like these ought to be coded as NA.</span></a></code></pre></div>
+<p>Take another look at the data. You should find that for the dataset, most things look reasonable, but the variable <code>Setting_1</code> has a lot of different levels/values. That many categories, most with only a single entry, will likely not be meaningful for modeling. One option is to drop the variable. But assume we think it’s an important variable to include and we are especially interested in the difference between restaurant settings and other settings. We could then create a new variable that has only two levels, <code>Restaurant</code> and <code>Other</code>.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1"><span class="co">#write code that creates a new variable called `Setting` based on `Setting_1` buth with only 2 levels, `Restaurant` and `Other`. Then remove the `Setting_1` variable. Note that restaurant is sometimes capitalized and sometimes not. You need to fix that first. For these lines of code, the &#39;Factor&#39; chapter in R4DS might be helpful here.</span></a>
+<a class="sourceLine" id="cb56-2" data-line-number="2"><span class="kw">levels</span>(dat_temp5<span class="op">$</span>Setting_<span class="dv">1</span>)[<span class="kw">grep</span>(<span class="st">&quot;restaurant&quot;</span>, <span class="kw">levels</span>(dat_temp5<span class="op">$</span>Setting_<span class="dv">1</span>), <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>)]</a></code></pre></div>
+<pre><code>## [1] &quot;Catering service in Restaurant&quot;   &quot;restaurant&quot;                      
+## [3] &quot;Restaurant&quot;                       &quot;restaurant in Northern Territory&quot;
+## [5] &quot;Shared meal at a restaurant&quot;      &quot;take-out restaurant&quot;</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1"><span class="co"># There are 2 categories that could be considered restaurant</span></a>
+<a class="sourceLine" id="cb58-2" data-line-number="2"><span class="co"># Convert all others to &#39;Other&#39;</span></a>
+<a class="sourceLine" id="cb58-3" data-line-number="3">dat_temp6 &lt;-<span class="st"> </span>dat_temp5 <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb58-4" data-line-number="4"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Setting =</span> <span class="kw">ifelse</span>(Setting_<span class="dv">1</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">levels</span>(dat_temp5<span class="op">$</span>Setting_<span class="dv">1</span>)[<span class="kw">grep</span>(<span class="st">&quot;restaurant&quot;</span>, <span class="kw">levels</span>(dat_temp5<span class="op">$</span>Setting_<span class="dv">1</span>), <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>)], <span class="st">&quot;Restaurant&quot;</span>, <span class="st">&quot;Other&quot;</span>))</a>
+<a class="sourceLine" id="cb58-5" data-line-number="5">(dat_temp6[, <span class="kw">c</span>(<span class="st">&quot;Setting&quot;</span>, <span class="st">&quot;Setting_1&quot;</span>)])</a></code></pre></div>
+<pre><code>## # A tibble: 513 x 2
+##    Setting    Setting_1                 
+##    &lt;chr&gt;      &lt;fct&gt;                     
+##  1 Other      Boxed lunch, football game
+##  2 Other      buffet                    
+##  3 Restaurant restaurant                
+##  4 Other      buffet                    
+##  5 Restaurant take-out restaurant       
+##  6 Other      buffet                    
+##  7 Restaurant restaurant                
+##  8 Other      in El Grao de Castello_n  
+##  9 Other      0                         
+## 10 Other      Luncheon and Restaruant   
+## # … with 503 more rows</code></pre>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" data-line-number="1"><span class="kw">table</span>(dat_temp6<span class="op">$</span>Setting) <span class="co">#111 Restaurant, 468 Other</span></a></code></pre></div>
+<pre><code>## 
+##      Other Restaurant 
+##        404        109</code></pre>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1">dat_temp6<span class="op">$</span>Setting &lt;-<span class="st"> </span><span class="kw">factor</span>(dat_temp6<span class="op">$</span>Setting)</a>
+<a class="sourceLine" id="cb62-2" data-line-number="2">dat_temp6<span class="op">$</span>Setting_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb62-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb62-4" data-line-number="4">dat_final &lt;-<span class="st"> </span>dat_temp6</a></code></pre></div>
+<div class="note">
+<p>I found 6 categories in Setting_1 that occurred in a Restaurant setting, so anything with those categories was reclassified as Restaurant (N = 109) and everything else as Other (N = 404)</p>
+</div>
+</div>
+<div id="data-visualization" class="section level2">
+<h2>Data visualization</h2>
+<p>Next, let’s create a few plots showing the outcome and the predictors.</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1"><span class="co">#write code that produces plots showing our outcome of interest on the y-axis and each numeric predictor on the x-axis.</span></a>
+<a class="sourceLine" id="cb63-2" data-line-number="2"><span class="co"># These are the numeric variables</span></a>
+<a class="sourceLine" id="cb63-3" data-line-number="3">numeric_var &lt;-<span class="st"> </span><span class="kw">select_if</span>(dat_final, is.numeric) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">names</span>()</a>
+<a class="sourceLine" id="cb63-4" data-line-number="4">caret<span class="op">::</span><span class="kw">featurePlot</span>(<span class="dt">x =</span> dat_final[, numeric_var[numeric_var <span class="op">!=</span><span class="st"> &quot;FracInf&quot;</span>]], </a>
+<a class="sourceLine" id="cb63-5" data-line-number="5">            <span class="dt">y =</span> dat_final<span class="op">$</span>FracInf, </a>
+<a class="sourceLine" id="cb63-6" data-line-number="6">            <span class="dt">plot =</span> <span class="st">&quot;scatter&quot;</span>, </a>
+<a class="sourceLine" id="cb63-7" data-line-number="7">            <span class="dt">layout =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">3</span>)) </a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/plots-1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1"><span class="co"># I couldn&#39;t figure out how to add a title</span></a>
+<a class="sourceLine" id="cb64-2" data-line-number="2"><span class="co">#you can use the facet_wrap functionality in ggplot for it, or do it some other way.</span></a></code></pre></div>
+<p>One thing I notice in the plots is that there are lots of zeros for many predictors and things look skewed. That’s ok, but means we should probably standardize these predictors. One strange finding (that I could have caught further up when printing the numeric summaries, but didn’t) is that there is (at least) one outbreak that has outbreak year reported as 0. That is, of course, wrong and needs to be fixed. There are different ways of fixing it, the best, of course, would be to trace it back and try to fix it with the right value. We won’t do that here. Instead, we’ll remove that observation.</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" data-line-number="1"><span class="co"># write code that figures out which observation(s) have 0 years and remove those from the dataset.</span></a>
+<a class="sourceLine" id="cb65-2" data-line-number="2">(dat_final[dat_final<span class="op">$</span>OBYear <span class="op">==</span><span class="st"> &quot;0&quot;</span>,])</a></code></pre></div>
+<pre><code>## # A tibble: 1 x 20
+##   FracInf Action1 CasesAll Category Country Deaths GG2C4 Hemisphere
+##     &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt; &lt;fct&gt;    &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;     
+## 1    4.55 Yes           11 Hospital Other        0 No    Northern  
+## # … with 12 more variables: Hospitalizations &lt;dbl&gt;, MeanD1 &lt;dbl&gt;,
+## #   MeanI1 &lt;dbl&gt;, MedianD1 &lt;dbl&gt;, MedianI1 &lt;dbl&gt;, OBYear &lt;fct&gt;,
+## #   Path1 &lt;fct&gt;, RiskAll &lt;dbl&gt;, Season &lt;fct&gt;, Trans1 &lt;fct&gt;, Vomit &lt;fct&gt;,
+## #   Setting &lt;fct&gt;</code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" data-line-number="1">dat_final &lt;-<span class="st"> </span>dat_final <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb67-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(OBYear <span class="op">!=</span><span class="st"> &quot;0&quot;</span>)</a>
+<a class="sourceLine" id="cb67-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb67-4" data-line-number="4">dat_final<span class="op">$</span>OBYear &lt;-<span class="st"> </span><span class="kw">droplevels</span>(dat_final<span class="op">$</span>OBYear)</a>
+<a class="sourceLine" id="cb67-5" data-line-number="5"><span class="kw">levels</span>(dat_final<span class="op">$</span>OBYear)</a></code></pre></div>
+<pre><code>##  [1] &quot;1983&quot; &quot;1990&quot; &quot;1993&quot; &quot;1994&quot; &quot;1995&quot; &quot;1996&quot; &quot;1997&quot; &quot;1998&quot; &quot;1999&quot; &quot;2000&quot;
+## [11] &quot;2001&quot; &quot;2002&quot; &quot;2003&quot; &quot;2004&quot; &quot;2005&quot; &quot;2006&quot; &quot;2007&quot; &quot;2008&quot; &quot;2009&quot; &quot;2010&quot;</code></pre>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" data-line-number="1"><span class="co"># do some quick check to make sure OByear values are all reasonable now</span></a></code></pre></div>
+<p>Another useful check is to see if there are strong correlations between some of the numeric predictors. That might indicate collinearity, and some models can’t handle that very well. In such cases, one might want to remove a predictor. We’ll create a correlation plot of the numeric variables to inspect this.</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" data-line-number="1"><span class="co"># using e.g. the corrplot package (or any other you like), create a correlation plot of the numeric variables</span></a>
+<a class="sourceLine" id="cb70-2" data-line-number="2">(res &lt;-<span class="st"> </span><span class="kw">cor</span>(dat_final[, numeric_var], <span class="dt">method =</span> <span class="st">&quot;pearson&quot;</span>, <span class="dt">use =</span> <span class="st">&quot;complete.obs&quot;</span>))</a></code></pre></div>
+<pre><code>##                        FracInf      CasesAll      Deaths Hospitalizations
+## FracInf           1.0000000000 -0.0483655632 -0.02389194     -0.021772478
+## CasesAll         -0.0483655632  1.0000000000  0.03624093      0.047153811
+## Deaths           -0.0238919417  0.0362409291  1.00000000      0.174813262
+## Hospitalizations -0.0217724781  0.0471538114  0.17481326      1.000000000
+## MeanD1            0.0241838878  0.0037350564  0.06507684     -0.023784633
+## MeanI1            0.0824804960  0.0001484477 -0.01892262     -0.014121569
+## MedianD1          0.0004746806  0.0122833731 -0.03173131      0.131057694
+## MedianI1          0.0040628802  0.0364648941 -0.02927437      0.009291043
+## RiskAll          -0.2507831032  0.5644317912  0.02209444      0.070032524
+##                        MeanD1        MeanI1      MedianD1     MedianI1
+## FracInf           0.024183888  0.0824804960  0.0004746806  0.004062880
+## CasesAll          0.003735056  0.0001484477  0.0122833731  0.036464894
+## Deaths            0.065076839 -0.0189226175 -0.0317313137 -0.029274369
+## Hospitalizations -0.023784633 -0.0141215686  0.1310576941  0.009291043
+## MeanD1            1.000000000  0.3448628777  0.0267261939  0.007930214
+## MeanI1            0.344862878  1.0000000000 -0.0089535824  0.079095508
+## MedianD1          0.026726194 -0.0089535824  1.0000000000  0.443538745
+## MedianI1          0.007930214  0.0790955081  0.4435387453  1.000000000
+## RiskAll           0.009921735 -0.0293000335  0.0021870476 -0.017082493
+##                       RiskAll
+## FracInf          -0.250783103
+## CasesAll          0.564431791
+## Deaths            0.022094436
+## Hospitalizations  0.070032524
+## MeanD1            0.009921735
+## MeanI1           -0.029300033
+## MedianD1          0.002187048
+## MedianI1         -0.017082493
+## RiskAll           1.000000000</code></pre>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" data-line-number="1"><span class="co"># Pearson correlation, using complete observations only</span></a>
+<a class="sourceLine" id="cb72-2" data-line-number="2"><span class="kw">corrplot</span>(res, <span class="dt">title =</span> <span class="st">&quot;Pearson correlation for numeric variables, complete observations only&quot;</span>)</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/corrplot-1.png" width="672" /></p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1"><span class="co"># The above is awesome</span></a></code></pre></div>
+<div class="note">
+<p>The highest correlations are for CasesAll with RiskAll (positive, r = 0.56) and RiskAll with FracInf (negative, r = -0.25).</p>
+</div>
+<p>It doesn’t look like there are any very strong correlations between continuous variables, so we can keep them all for now.</p>
+<p>Next, let’s create plots for the categorical variables, again our main outcome of interest on the y-axis.</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1"><span class="co">#write code that produces plots showing our outcome of interest on the y-axis and each categorical predictor on the x-axis.</span></a>
+<a class="sourceLine" id="cb74-2" data-line-number="2">(categ_var &lt;-<span class="st"> </span><span class="kw">setdiff</span>(<span class="kw">names</span>(dat_final), numeric_var))</a></code></pre></div>
+<pre><code>##  [1] &quot;Action1&quot;    &quot;Category&quot;   &quot;Country&quot;    &quot;GG2C4&quot;      &quot;Hemisphere&quot;
+##  [6] &quot;OBYear&quot;     &quot;Path1&quot;      &quot;Season&quot;     &quot;Trans1&quot;     &quot;Vomit&quot;     
+## [11] &quot;Setting&quot;</code></pre>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1"><span class="co"># For some reason, I couldn&#39;t feed in the data.frame of categorical variables the same way I did for numeric with &#39;caret&#39; package. It requires a vector for &#39;y&#39;. So I&#39;m using a clunky loop!</span></a>
+<a class="sourceLine" id="cb76-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb76-3" data-line-number="3"><span class="cf">for</span>(i <span class="cf">in</span> categ_var) {</a>
+<a class="sourceLine" id="cb76-4" data-line-number="4">  <span class="kw">print</span>(caret<span class="op">::</span><span class="kw">featurePlot</span>(<span class="dt">x =</span> dat_final<span class="op">$</span>FracInf, </a>
+<a class="sourceLine" id="cb76-5" data-line-number="5">            <span class="dt">y =</span> dat_final[, i] <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>(i),</a>
+<a class="sourceLine" id="cb76-6" data-line-number="6">            <span class="dt">plot =</span> <span class="st">&quot;box&quot;</span>,</a>
+<a class="sourceLine" id="cb76-7" data-line-number="7">            <span class="dt">scales =</span> <span class="kw">list</span>(<span class="dt">x =</span> <span class="kw">list</span>(<span class="dt">rot =</span> <span class="dv">90</span>)),</a>
+<a class="sourceLine" id="cb76-8" data-line-number="8">            <span class="dt">label =</span> <span class="kw">c</span>(i, <span class="st">&quot;FracInf&quot;</span>)))</a>
+<a class="sourceLine" id="cb76-9" data-line-number="9">}</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-1.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-2.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-3.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-4.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-5.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-6.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-7.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-8.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-9.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-10.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/plots-2-11.png" width="672" /></p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1"><span class="co">#you can use the facet_wrap functionality in ggplot for it, or do it some other way.</span></a></code></pre></div>
+<p>The plots do not look pretty, which is ok for exploratory. We can see that a few variables have categories with very few values (again, something we could have also seen using <code>summary</code>, but graphically it is usually easier to see). This will likely produce problems when we fit using cross-validation, so we should fix that. Options we have:</p>
+<ul>
+<li>Completely drop those variables if we decide they are not of interest after all.</li>
+<li>Recode values by combining, like we did above with the <code>Setting</code> variable.</li>
+<li>Remove observations with those rare values.</li>
+</ul>
+<p>Let’s use a mix of these approaches. We’ll drop the <code>Category</code> variable, we’ll remove the observation(s) with <code>Unspecified</code> in the <code>Hemisphere</code> variable, and we’ll combine <code>Unknown</code> with <code>Unspecified</code> for <code>Action1</code> and <code>Path1</code> variables.</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1"><span class="co"># write code that implements the cleaning steps described above.</span></a>
+<a class="sourceLine" id="cb78-2" data-line-number="2">dat_final<span class="op">$</span>Category &lt;-<span class="st"> </span><span class="ot">NULL</span> <span class="co"># drop the &#39;Category&#39; variable</span></a>
+<a class="sourceLine" id="cb78-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb78-4" data-line-number="4"><span class="co"># Drop records with &#39;Unspecified&#39; for &#39;Hemisphere&#39;</span></a>
+<a class="sourceLine" id="cb78-5" data-line-number="5">dat_final &lt;-<span class="st"> </span>dat_final <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb78-6" data-line-number="6"><span class="st">  </span><span class="kw">filter</span>(Hemisphere <span class="op">!=</span><span class="st"> &quot;Unspecified&quot;</span>)</a>
+<a class="sourceLine" id="cb78-7" data-line-number="7"><span class="kw">table</span>(dat_final<span class="op">$</span>Hemisphere)</a></code></pre></div>
+<pre><code>## 
+## Northern Southern 
+##      486       26</code></pre>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1">dat_final<span class="op">$</span>Hemisphere &lt;-<span class="st"> </span><span class="kw">droplevels</span>(dat_final<span class="op">$</span>Hemisphere)</a>
+<a class="sourceLine" id="cb80-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb80-3" data-line-number="3"><span class="co"># Combine &#39;Unknown&#39; and &#39;Unspecified&#39;</span></a>
+<a class="sourceLine" id="cb80-4" data-line-number="4">dat_final<span class="op">$</span>Action1[dat_final<span class="op">$</span>Action1 <span class="op">==</span><span class="st"> &quot;Unknown&quot;</span>] &lt;-<span class="st"> &quot;Unspecified&quot;</span></a>
+<a class="sourceLine" id="cb80-5" data-line-number="5">dat_final<span class="op">$</span>Path1[dat_final<span class="op">$</span>Path1 <span class="op">==</span><span class="st"> &quot;Unknown&quot;</span>] &lt;-<span class="st"> &quot;Unspecified&quot;</span></a>
+<a class="sourceLine" id="cb80-6" data-line-number="6">dat_final &lt;-<span class="st"> </span><span class="kw">droplevels</span>(dat_final)</a>
+<a class="sourceLine" id="cb80-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb80-8" data-line-number="8"><span class="co"># then check again (e.g. with a plot) to make sure things worked</span></a>
+<a class="sourceLine" id="cb80-9" data-line-number="9"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="st">&quot;Hemisphere&quot;</span>, <span class="st">&quot;Action1&quot;</span>, <span class="st">&quot;Path1&quot;</span>)) {</a>
+<a class="sourceLine" id="cb80-10" data-line-number="10">  <span class="kw">print</span>(caret<span class="op">::</span><span class="kw">featurePlot</span>(<span class="dt">x =</span> dat_final<span class="op">$</span>FracInf, </a>
+<a class="sourceLine" id="cb80-11" data-line-number="11">            <span class="dt">y =</span> dat_final[, i] <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>(i),</a>
+<a class="sourceLine" id="cb80-12" data-line-number="12">            <span class="dt">plot =</span> <span class="st">&quot;box&quot;</span>,</a>
+<a class="sourceLine" id="cb80-13" data-line-number="13">            <span class="dt">scales =</span> <span class="kw">list</span>(<span class="dt">x =</span> <span class="kw">list</span>(<span class="dt">rot =</span> <span class="dv">90</span>)),</a>
+<a class="sourceLine" id="cb80-14" data-line-number="14">            <span class="dt">label =</span> <span class="kw">c</span>(i, <span class="st">&quot;FracInf&quot;</span>)))</a>
+<a class="sourceLine" id="cb80-15" data-line-number="15">}</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/clean-categorical-1.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/clean-categorical-2.png" width="672" /><img src="Continuous_Outcome_Analysis_files/figure-html/clean-categorical-3.png" width="672" /></p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" data-line-number="1"><span class="kw">dim</span>(dat_final)</a></code></pre></div>
+<pre><code>## [1] 512  19</code></pre>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" data-line-number="1"><span class="kw">summary</span>(dat_final)</a></code></pre></div>
+<pre><code>##     FracInf                Action1       CasesAll           Country   
+##  Min.   :  0.4074   Unspecified:395   Min.   :   1.00   Japan   :242  
+##  1st Qu.: 17.8283   Yes        :117   1st Qu.:   7.00   Multiple: 14  
+##  Median : 39.3520                     Median :  20.00   Other   :184  
+##  Mean   : 42.2154                     Mean   :  89.52   USA     : 72  
+##  3rd Qu.: 61.1111                     3rd Qu.:  60.25                 
+##  Max.   :104.7770                     Max.   :7150.00                 
+##                                                                       
+##      Deaths        GG2C4        Hemisphere  Hospitalizations 
+##  Min.   :0.00000   No :361   Northern:486   Min.   : 0.0000  
+##  1st Qu.:0.00000   Yes:151   Southern: 26   1st Qu.: 0.0000  
+##  Median :0.00000                            Median : 0.0000  
+##  Mean   :0.07227                            Mean   : 0.6973  
+##  3rd Qu.:0.00000                            3rd Qu.: 0.0000  
+##  Max.   :9.00000                            Max.   :99.0000  
+##                                                              
+##      MeanD1           MeanI1           MedianD1         MedianI1     
+##  Min.   : 0.000   Min.   : 0.0000   Min.   : 0.000   Min.   : 0.000  
+##  1st Qu.: 0.000   1st Qu.: 0.0000   1st Qu.: 0.000   1st Qu.: 0.000  
+##  Median : 0.000   Median : 0.0000   Median : 0.000   Median : 0.000  
+##  Mean   : 1.957   Mean   : 0.9277   Mean   : 3.328   Mean   : 2.281  
+##  3rd Qu.: 0.000   3rd Qu.: 0.0000   3rd Qu.: 0.000   3rd Qu.: 0.000  
+##  Max.   :96.000   Max.   :43.0000   Max.   :72.000   Max.   :65.000  
+##                                                                      
+##      OBYear            Path1        RiskAll           Season   
+##  2006   : 85   No         : 98   Min.   :    1.0   Fall  : 86  
+##  2002   : 59   Unspecified:393   1st Qu.:   23.0   Spring:117  
+##  2003   : 53   Yes        : 21   Median :   73.5   Summer: 62  
+##  1999   : 45                     Mean   :  505.1   Winter:247  
+##  2005   : 40                     3rd Qu.:  217.8               
+##  2000   : 36                     Max.   :24000.0               
+##  (Other):194                                                   
+##               Trans1    Vomit         Setting   
+##  Environmental   :  8   0:218   Other     :403  
+##  Foodborne       :225   1:294   Restaurant:109  
+##  Person to Person: 59                           
+##  Unknown         : 43                           
+##  Unspecified     :139                           
+##  Waterborne      : 38                           
+## </code></pre>
+<div class="note">
+<p>My final data number don’t match what Dr. Handel said we should have, but I can’t figure out why. I have 512 observations (instead of 551). Aaargh!</p>
+</div>
+<p>At this step, you should have a dataframe containing 551 observations, and 19 variables: 1 outcome, 9 numeric/integer predictors, and 9 factor variables. There should be no missing values.</p>
+</div>
+</div>
+<div id="model-fitting" class="section level1">
+<h1>Model fitting</h1>
+<p>We can finally embark on some modeling - or at least we can get ready to do so.</p>
+<p>We will use a lot of the <code>caret</code> package functionality for the following tasks. You might find <a href="https://topepo.github.io/caret/index.html">the package website</a> useful as you try to figure things out.</p>
+<div id="data-splitting" class="section level2">
+<h2>Data splitting</h2>
+<p>Depending on the data and question, we might want to reserve some of the data for a final validation/testing step or not. Here, to illustrate this process and the idea of reserving some data for the very end, we’ll split things into a train and test set. All the modeling will be done with the train set, and final evaluation of the model(s) happens on the test set. We use the <code>caret</code> package for this.</p>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb85-1" data-line-number="1"><span class="co">#this code does the data splitting. I still assume that your data is stored in the `d` object.</span></a>
+<a class="sourceLine" id="cb85-2" data-line-number="2"><span class="co">#uncomment to run</span></a>
+<a class="sourceLine" id="cb85-3" data-line-number="3">d &lt;-<span class="st"> </span>dat_final <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb85-4" data-line-number="4"><span class="st">  </span><span class="kw">rename</span>(<span class="dt">fracinf =</span> FracInf)</a>
+<a class="sourceLine" id="cb85-5" data-line-number="5"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb85-6" data-line-number="6">trainset &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> d<span class="op">$</span>fracinf, <span class="dt">p =</span> <span class="fl">0.7</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb85-7" data-line-number="7">data_train =<span class="st"> </span>d[trainset,] <span class="co">#extract observations/rows for training, assign to new variable</span></a>
+<a class="sourceLine" id="cb85-8" data-line-number="8">data_test =<span class="st"> </span>d[<span class="op">-</span>trainset,] <span class="co">#do the same for the test set</span></a>
+<a class="sourceLine" id="cb85-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb85-10" data-line-number="10"><span class="co"># Check it</span></a>
+<a class="sourceLine" id="cb85-11" data-line-number="11"><span class="kw">dim</span>(d)</a></code></pre></div>
+<pre><code>## [1] 512  19</code></pre>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb87-1" data-line-number="1"><span class="kw">dim</span>(data_train)</a></code></pre></div>
+<pre><code>## [1] 360  19</code></pre>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" data-line-number="1"><span class="kw">dim</span>(data_test)</a></code></pre></div>
+<pre><code>## [1] 152  19</code></pre>
+<div class="note">
+<p>Since the above code involves drawing samples, and we want to do that reproducible, we also set a random number seed with <code>set.seed()</code>. With that, each time we perform this sampling, it will be the same, unless we change the seed. If nothing about the code changes, setting the seed once at the beginning is enough. If you want to be extra sure, it is a good idea to set the seed at the beginning of every code chunk that involves random numbers (i.e., sampling or some other stochastic/random procedure). We do that here.</p>
+</div>
+</div>
+<div id="a-null-model" class="section level2">
+<h2>A null model</h2>
+<p>Now let’s begin with the model fitting. We’ll start by looking at a <em>null model</em>, which is just the mean of the data. This is, of course, a stupid “model” but provides some baseline for performance.</p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" data-line-number="1"><span class="co">#write code that computes the RMSE for a null model, which is just the mean of the outcome</span></a>
+<a class="sourceLine" id="cb91-2" data-line-number="2"><span class="kw">summary</span>(modcheck_null &lt;-<span class="st"> </span><span class="kw">lm</span>(fracinf <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> data_train)) </a></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = fracinf ~ 1, data = data_train)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -41.453 -24.069  -2.607  19.152  58.041 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   41.959      1.481   28.34   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 28.09 on 359 degrees of freedom</code></pre>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb93-1" data-line-number="1"><span class="co"># mean is 41.959</span></a>
+<a class="sourceLine" id="cb93-2" data-line-number="2"><span class="co"># Residual standard error is 28.09</span></a>
+<a class="sourceLine" id="cb93-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb93-4" data-line-number="4"><span class="kw">mean</span>(data_train<span class="op">$</span>fracinf) <span class="co">#double-check</span></a></code></pre></div>
+<pre><code>## [1] 41.95884</code></pre>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb95-1" data-line-number="1"><span class="co">#remember that from now on until the end, everything happens with the training data</span></a></code></pre></div>
+</div>
+<div id="single-predictor-models" class="section level2">
+<h2>Single predictor models</h2>
+<p>Now we’ll fit the outcome to each predictor one at a time. To evaluate our model performance, we will use cross-validation and the caret package. Note that we just fit a linear model. <code>caret</code> itself is not a model. Instead, it provides an interface that allows easy access to many different models and has functions to do a lot of steps quickly - as you will see below. Most of the time, you can do all our work through the <code>caret</code> (or <code>mlr</code>) workflow. The problem is that because <code>caret</code> calls another package/function, sometimes things are not as clear, especially when you get an error message. So occasionally, if you know you want to use a specific model and want more control over things, you might want to not use <code>caret</code> and instead go straight to the model function (e.g. <code>lm</code> or <code>glm</code> or…). We’ve done a bit of that before, for the remainder of the class we’ll mostly access underlying functions through <code>caret</code>.</p>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" data-line-number="1"><span class="co">#There is probably a nicer tidyverse way of doing this. I just couldn&#39;t think of it, so did it this way.</span></a>
+<a class="sourceLine" id="cb96-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb96-3" data-line-number="3">fitControl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;repeatedcv&quot;</span>,<span class="dt">number=</span><span class="dv">5</span>,<span class="dt">repeats=</span><span class="dv">5</span>) <span class="co">#setting CV method for caret</span></a>
+<a class="sourceLine" id="cb96-4" data-line-number="4"><span class="co"># Number = number of folds or resampling iterations</span></a>
+<a class="sourceLine" id="cb96-5" data-line-number="5"><span class="co"># Repeats is the number of complete sets of folds to compute</span></a>
+<a class="sourceLine" id="cb96-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb96-7" data-line-number="7">Npred &lt;-<span class="st"> </span><span class="kw">ncol</span>(data_train)<span class="op">-</span><span class="dv">1</span> <span class="co"># number of predictors</span></a>
+<a class="sourceLine" id="cb96-8" data-line-number="8">resultmat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Variable =</span> <span class="kw">names</span>(data_train)[<span class="op">-</span><span class="dv">1</span>], <span class="dt">RMSE =</span> <span class="kw">rep</span>(<span class="dv">0</span>,Npred)) <span class="co">#store values for RMSE for each variable</span></a>
+<a class="sourceLine" id="cb96-9" data-line-number="9"><span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span><span class="kw">ncol</span>(data_train)) <span class="co">#loop over each predictor. For this to work, outcome must be in 1st column</span></a>
+<a class="sourceLine" id="cb96-10" data-line-number="10">{</a>
+<a class="sourceLine" id="cb96-11" data-line-number="11">fit1 &lt;-<span class="st"> </span><span class="kw">train</span>( <span class="kw">as.formula</span>(<span class="kw">paste</span>(<span class="st">&quot;fracinf ~&quot;</span>,<span class="kw">names</span>(data_train)[n])) , <span class="dt">data =</span> data_train, <span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">trControl =</span> fitControl)</a>
+<a class="sourceLine" id="cb96-12" data-line-number="12">resultmat[n<span class="dv">-1</span>,<span class="dv">2</span>]=<span class="st"> </span>fit1<span class="op">$</span>results<span class="op">$</span>RMSE</a>
+<a class="sourceLine" id="cb96-13" data-line-number="13">}</a>
+<a class="sourceLine" id="cb96-14" data-line-number="14"><span class="kw">print</span>(resultmat)</a></code></pre></div>
+<pre><code>##            Variable     RMSE
+## 1           Action1 28.12158
+## 2          CasesAll 28.03071
+## 3           Country 28.00001
+## 4            Deaths 28.06439
+## 5             GG2C4 27.42696
+## 6        Hemisphere 28.11377
+## 7  Hospitalizations 28.09393
+## 8            MeanD1 28.12761
+## 9            MeanI1 27.91093
+## 10         MedianD1 28.07084
+## 11         MedianI1 28.10053
+## 12           OBYear 26.84093
+## 13            Path1 28.13463
+## 14          RiskAll 27.94423
+## 15           Season 28.03060
+## 16           Trans1 26.55218
+## 17            Vomit 27.91736
+## 18          Setting 26.37400</code></pre>
+<p>This analysis shows 2 things that might need closer inspections. We get some error/warning messages, and most RMSE of the single-predictor models are not better than the null model. Usually, this is cause for more careful checking until you fully understand what is going on. But for this exercise, let’s blindly press on!</p>
+</div>
+<div id="multi-predictor-models" class="section level2">
+<h2>Multi-predictor models</h2>
+<p>Now let’s perform fitting with multiple predictors. Use the same setup as the code above to fit the outcome to all predictors at the same time. Do that for 3 different models: linear (<code>lm</code>), regression splines (<code>earth</code>), K nearest neighbor (<code>knn</code>). You might have to install/load some extra R packages for that. If that’s the case, <code>caret</code> will tell you.</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb98-2" data-line-number="2"><span class="co">#write code that uses the train function in caret to fit the outcome to all predictors using the 3 methods specified.</span></a>
+<a class="sourceLine" id="cb98-3" data-line-number="3"><span class="co"># Using lm...</span></a>
+<a class="sourceLine" id="cb98-4" data-line-number="4">(fit_all &lt;-<span class="st"> </span><span class="kw">train</span>(fracinf <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train, <span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">trControl =</span> fitControl)) </a></code></pre></div>
+<pre><code>## Linear Regression 
+## 
+## 360 samples
+##  18 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 289, 287, 288, 288, 288, 288, ... 
+## Resampling results:
+## 
+##   RMSE     Rsquared   MAE     
+##   25.5619  0.2641809  19.54401
+## 
+## Tuning parameter &#39;intercept&#39; was held constant at a value of TRUE</code></pre>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" data-line-number="1"><span class="co"># RMSE 25.6</span></a>
+<a class="sourceLine" id="cb100-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb100-3" data-line-number="3"><span class="co"># Using earth (regression splines)</span></a>
+<a class="sourceLine" id="cb100-4" data-line-number="4">(fit_earth &lt;-<span class="st"> </span><span class="kw">train</span>(fracinf <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train, <span class="dt">method =</span> <span class="st">&quot;earth&quot;</span>, <span class="dt">trControl =</span> fitControl)) </a></code></pre></div>
+<pre><code>## Multivariate Adaptive Regression Spline 
+## 
+## 360 samples
+##  18 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 288, 287, 288, 288, 289, 288, ... 
+## Resampling results across tuning parameters:
+## 
+##   nprune  RMSE      Rsquared   MAE     
+##    2      24.63630  0.2384951  19.84961
+##    9      13.90698  0.7601332  10.22214
+##   17      13.58561  0.7703895  10.15839
+## 
+## Tuning parameter &#39;degree&#39; was held constant at a value of 1
+## RMSE was used to select the optimal model using the smallest value.
+## The final values used for the model were nprune = 17 and degree = 1.</code></pre>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1"><span class="co"># smallest RMSE is 13.6 (nprune = 17, RMSE = 13.58561, R2 = 0.7703895, MAE = 10.15839)</span></a>
+<a class="sourceLine" id="cb102-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb102-3" data-line-number="3"><span class="co">#using knn</span></a>
+<a class="sourceLine" id="cb102-4" data-line-number="4">(fit_knn &lt;-<span class="st"> </span><span class="kw">train</span>(fracinf <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train, <span class="dt">method =</span> <span class="st">&quot;knn&quot;</span>, <span class="dt">trControl =</span> fitControl)) </a></code></pre></div>
+<pre><code>## k-Nearest Neighbors 
+## 
+## 360 samples
+##  18 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 289, 288, 288, 287, 288, 288, ... 
+## Resampling results across tuning parameters:
+## 
+##   k  RMSE      Rsquared   MAE     
+##   5  10.05837  0.8750583  7.058873
+##   7  10.33878  0.8695347  7.414115
+##   9  10.70960  0.8609822  7.701275
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was k = 5.</code></pre>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1"><span class="co"># smallest RMSE is 10.05 (k = 5, RMSE = 10.05837, R2 = 0.8750583, MAE = 7.058873)</span></a>
+<a class="sourceLine" id="cb104-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb104-3" data-line-number="3"><span class="co">#report the RMSE for each method. Note that knn and earth perform some model tuning (we&#39;ll discuss this soon) and report multiple RMSE. Use the lowest value.</span></a></code></pre></div>
+<div class="note">
+<p>RMSE for the various models. Remember that null RMSE was 28.09. For the three models on all predictors…</p>
+<ul>
+<li><p>RMSE = 25.6 for ‘lm’</p></li>
+<li><p>smallest RMSE = 13.6 for ‘earth’</p></li>
+<li>smallest RMSE = 10.05 for ‘knn’</li>
+</ul>
+</div>
+<p>So we find that some of these models do better than the null model and the single-predictor ones. KNN seems the best of those 3. Next, we want to see if pre-processing our data a bit more might lead to even better results.</p>
+</div>
+<div id="multi-predictor-models-with-pre-processing" class="section level2">
+<h2>Multi-predictor models with pre-processing</h2>
+<p>Above, we fit outcome and predictors without doing anything to them. Let’s see if some further processing improves the performance of our multi-predictor models.</p>
+<p>First, we look at near-zero variance predictors. Those are predictors that have very little variation. For instance, for a categorical predictor, if 99% of the values are a single category, it is likely not a useful predictor. A similar idea holds for continuous predictors. If they have very little spread, they might likely not contribute much ‘signal’ to our fitting and instead mainly contain noise. Some models, such as trees, which we’ll cover soon, can ignore useless predictors and just remove them. Other models, e.g., linear models, are generally performing better if we remove such useless predictors.</p>
+<p>Note that in general, one should apply all these processing steps to the training data only. Otherwise, you would use information from the test set to decide on data manipulations for all data (called data leakage). It is a bit hard to say when to make the train/test split. Above, we did a good bit of cleaning on the full dataset before we split. One could argue that one should split right at the start, then do the cleaning. However, this doesn’t work for certain procedures (e.g., removing observations with NA).</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1"><span class="co">#write code using the caret function `nearZeroVar` to look at potential uninformative predictors. Set saveMetrics to TRUE. Look at the results </span></a>
+<a class="sourceLine" id="cb105-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb105-3" data-line-number="3"><span class="co"># Based on looking at the summary of data_train, these variables might have near-zero variance: Deaths, Hemisphere, Hospitalizations, MeanD1, Mean I1, MedianD1, MedianI1</span></a>
+<a class="sourceLine" id="cb105-4" data-line-number="4">(nzv_flag &lt;-<span class="st"> </span><span class="kw">nearZeroVar</span>(data_train, <span class="dt">saveMetrics =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<pre><code>##                   freqRatio percentUnique zeroVar   nzv
+## fracinf            2.555556    74.1666667   FALSE FALSE
+## Action1            3.285714     0.5555556   FALSE FALSE
+## CasesAll           1.000000    36.9444444   FALSE FALSE
+## Country            1.292308     1.1111111   FALSE FALSE
+## Deaths            87.750000     1.6666667   FALSE  TRUE
+## GG2C4              2.302752     0.5555556   FALSE FALSE
+## Hemisphere        24.714286     0.5555556   FALSE  TRUE
+## Hospitalizations  85.500000     2.7777778   FALSE  TRUE
+## MeanD1           170.500000     4.4444444   FALSE  TRUE
+## MeanI1           175.000000     2.2222222   FALSE  TRUE
+## MedianD1          48.285714     3.0555556   FALSE  TRUE
+## MedianI1          84.500000     3.8888889   FALSE  TRUE
+## OBYear             1.425000     5.2777778   FALSE FALSE
+## Path1              3.956522     0.8333333   FALSE FALSE
+## RiskAll            1.000000    59.7222222   FALSE FALSE
+## Season             2.346154     1.1111111   FALSE FALSE
+## Trans1             1.618557     1.6666667   FALSE FALSE
+## Vomit              1.368421     0.5555556   FALSE FALSE
+## Setting            3.390244     0.5555556   FALSE FALSE</code></pre>
+<p>You’ll see that several variables are flagged as having near-zero variance. Look for instance at <code>Deaths</code>, you’ll see that almost all outbreaks have zero deaths. It is a judgment call if we should remove all those flagged as near-zero-variance or not. For this exercise, we will.</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1"><span class="co">#write code that removes all variables with near zero variance from the data</span></a>
+<a class="sourceLine" id="cb107-2" data-line-number="2">(nzv_vars &lt;-<span class="st"> </span><span class="kw">rownames</span>(nzv_flag)[nzv_flag<span class="op">$</span>nzv <span class="op">==</span><span class="st"> </span><span class="ot">TRUE</span>])</a></code></pre></div>
+<pre><code>## [1] &quot;Deaths&quot;           &quot;Hemisphere&quot;       &quot;Hospitalizations&quot;
+## [4] &quot;MeanD1&quot;           &quot;MeanI1&quot;           &quot;MedianD1&quot;        
+## [7] &quot;MedianI1&quot;</code></pre>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1"><span class="co"># Need to remove 7 variables</span></a>
+<a class="sourceLine" id="cb109-2" data-line-number="2">data_train_pp &lt;-<span class="st"> </span>data_train <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb109-3" data-line-number="3"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">one_of</span>(nzv_vars))</a>
+<a class="sourceLine" id="cb109-4" data-line-number="4"><span class="kw">names</span>(data_train_pp)</a></code></pre></div>
+<pre><code>##  [1] &quot;fracinf&quot;  &quot;Action1&quot;  &quot;CasesAll&quot; &quot;Country&quot;  &quot;GG2C4&quot;    &quot;OBYear&quot;  
+##  [7] &quot;Path1&quot;    &quot;RiskAll&quot;  &quot;Season&quot;   &quot;Trans1&quot;   &quot;Vomit&quot;    &quot;Setting&quot;</code></pre>
+<div class="note">
+<p>Hmmm…I’m left with 12 variables, not 13. I don’t know where I went wrong, so I’ll have to push on for now…</p>
+</div>
+<p>You should be left with 13 variables (including the outcome).</p>
+<p>Next, we noticed during our exploratory analysis that it might be useful to center and scale predictors. So let’s do that now. With caret, one can do that by providing the <code>preProc</code> setting inside the <code>train</code> function. Set it to center and scale the data, then run the 3 models from above again.</p>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1"><span class="co">#write code that repeats the multi-predictor fits from above, but this time applies centering and scaling of variables.</span></a>
+<a class="sourceLine" id="cb111-2" data-line-number="2"><span class="co">#look at the RMSE for the new fits</span></a>
+<a class="sourceLine" id="cb111-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb111-4" data-line-number="4"><span class="co"># Using lm...</span></a>
+<a class="sourceLine" id="cb111-5" data-line-number="5">(fit_all_pp &lt;-<span class="st"> </span><span class="kw">train</span>(fracinf <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train_pp, <span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">preProcess =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>), <span class="dt">trControl =</span> fitControl)) </a></code></pre></div>
+<pre><code>## Linear Regression 
+## 
+## 360 samples
+##  11 predictor
+## 
+## Pre-processing: centered (38), scaled (38) 
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 288, 287, 288, 288, 289, 287, ... 
+## Resampling results:
+## 
+##   RMSE      Rsquared   MAE     
+##   26.02577  0.2632264  19.59916
+## 
+## Tuning parameter &#39;intercept&#39; was held constant at a value of TRUE</code></pre>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1"><span class="co"># RMSE 26 (this is worse than before)</span></a>
+<a class="sourceLine" id="cb113-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb113-3" data-line-number="3"><span class="co"># Using earth (regression splines)</span></a>
+<a class="sourceLine" id="cb113-4" data-line-number="4">(fit_earth_pp &lt;-<span class="st"> </span><span class="kw">train</span>(fracinf <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train_pp, <span class="dt">method =</span> <span class="st">&quot;earth&quot;</span>, <span class="dt">preProcess =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>), <span class="dt">trControl =</span> fitControl)) </a></code></pre></div>
+<pre><code>## Multivariate Adaptive Regression Spline 
+## 
+## 360 samples
+##  11 predictor
+## 
+## Pre-processing: centered (38), scaled (38) 
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 287, 289, 288, 288, 288, 288, ... 
+## Resampling results across tuning parameters:
+## 
+##   nprune  RMSE      Rsquared   MAE     
+##    2      24.56263  0.2371680  19.78337
+##    9      13.62793  0.7703310  10.15498
+##   16      13.58743  0.7726309  10.18051
+## 
+## Tuning parameter &#39;degree&#39; was held constant at a value of 1
+## RMSE was used to select the optimal model using the smallest value.
+## The final values used for the model were nprune = 16 and degree = 1.</code></pre>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" data-line-number="1"><span class="co"># smallest RMSE is 13.6 (nprune = 16, RMSE = 13.58743, R2 = 0.7726309, MAE = 10.18051) </span></a>
+<a class="sourceLine" id="cb115-2" data-line-number="2"><span class="co"># This is similar to before</span></a>
+<a class="sourceLine" id="cb115-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb115-4" data-line-number="4"><span class="co">#using knn</span></a>
+<a class="sourceLine" id="cb115-5" data-line-number="5">(fit_knn_pp &lt;-<span class="st"> </span><span class="kw">train</span>(fracinf <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train_pp, <span class="dt">method =</span> <span class="st">&quot;knn&quot;</span>, <span class="dt">preProcess =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>), <span class="dt">trControl =</span> fitControl)) </a></code></pre></div>
+<pre><code>## k-Nearest Neighbors 
+## 
+## 360 samples
+##  11 predictor
+## 
+## Pre-processing: centered (38), scaled (38) 
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 287, 288, 289, 288, 288, 288, ... 
+## Resampling results across tuning parameters:
+## 
+##   k  RMSE      Rsquared   MAE     
+##   5  24.15019  0.3123378  18.79922
+##   7  24.11474  0.3050887  19.00160
+##   9  24.04735  0.3000676  19.21754
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was k = 9.</code></pre>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1"><span class="co"># smallest RMSE is 24.04 (k = 9, RMSE = 24.04735, R2 = 0.3000676, MAE = 19.21754)</span></a>
+<a class="sourceLine" id="cb117-2" data-line-number="2"><span class="co"># This is much worse than before</span></a></code></pre></div>
+<div class="note">
+<p>Pre-processing didn’t do much good and made KNN much worse…</p>
+<ul>
+<li><p>RMSE = 26 for ‘lm’</p></li>
+<li><p>smallest RMSE = 13.6 for ‘earth’</p></li>
+<li>smallest RMSE = 24.04 for ‘knn’</li>
+</ul>
+</div>
+<p>So it looks like the linear mode got a bit better, KNN actually got worse, and MARS didn’t change much. Since for KNN, “the data is the model”, removing some predictors might have had a detrimental impact. Though to say something more useful, I would want to look much closer into what’s going on and if these pre-processing steps are useful or not. For this exercise, let’s move on.</p>
+</div>
+<div id="model-uncertainty" class="section level2">
+<h2>Model uncertainty</h2>
+<p>We can look at the uncertainty in model performance, e.g., the RMSE. Let’s look at it for the models fit to the un-processed data.</p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1"><span class="co">#Use the `resamples` function in caret to extract uncertainty from the 3 models fit to the data  that doesn&#39;t have predictor pre-processing, then plot it</span></a>
+<a class="sourceLine" id="cb118-2" data-line-number="2">extr_uncertainty &lt;-<span class="st"> </span><span class="kw">resamples</span>(<span class="kw">list</span>(fit_all, fit_earth, fit_knn), <span class="dt">modelNames =</span> <span class="kw">list</span>(<span class="st">&quot;fit_all&quot;</span>, <span class="st">&quot;fit_earth&quot;</span>, <span class="st">&quot;fit_knn&quot;</span>))</a>
+<a class="sourceLine" id="cb118-3" data-line-number="3"><span class="kw">View</span>(extr_uncertainty)</a>
+<a class="sourceLine" id="cb118-4" data-line-number="4">extr_uncertainty<span class="op">$</span>values<span class="op">$</span><span class="st">`</span><span class="dt">fit_all~RMSE</span><span class="st">`</span> </a></code></pre></div>
+<pre><code>##  [1] 19.91076 23.88021 23.40133 21.85372 24.13420 25.24462 24.06828
+##  [8] 25.32771 25.65046 23.88015 26.47089 31.26366 24.79774 31.69056
+## [15] 23.99912 24.73533 24.04581 23.55898 25.38609 30.43858 30.22804
+## [22] 24.19594 31.80974 25.41275 23.66280</code></pre>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1"><span class="kw">summary</span>(extr_uncertainty)</a></code></pre></div>
+<pre><code>## 
+## Call:
+## summary.resamples(object = extr_uncertainty)
+## 
+## Models: fit_all, fit_earth, fit_knn 
+## Number of resamples: 25 
+## 
+## MAE 
+##                Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&#39;s
+## fit_all   15.767535 18.776117 19.501738 19.544007 20.222152 23.386247    0
+## fit_earth  8.255813  9.386489 10.039178 10.158387 10.725816 12.579744    0
+## fit_knn    5.536000  6.436824  7.196365  7.058873  7.583833  8.463486    0
+## 
+## RMSE 
+##                Min.   1st Qu.   Median     Mean  3rd Qu.     Max. NA&#39;s
+## fit_all   19.910761 23.880207 24.73533 25.56190 25.65046 31.80974    0
+## fit_earth 10.856972 12.659303 13.29376 13.58561 14.76223 16.79598    0
+## fit_knn    8.085506  9.432462 10.14493 10.05837 10.71766 12.60497    0
+## 
+## Rsquared 
+##                Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&#39;s
+## fit_all   0.1518753 0.2208062 0.2509684 0.2641809 0.2982907 0.4866669    0
+## fit_earth 0.6993853 0.7391377 0.7753048 0.7703895 0.7908699 0.8474023    0
+## fit_knn   0.8122909 0.8524171 0.8761672 0.8750583 0.9069674 0.9162178    0</code></pre>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" data-line-number="1"><span class="co"># Plot it</span></a>
+<a class="sourceLine" id="cb122-2" data-line-number="2"><span class="kw">bwplot</span>(extr_uncertainty, <span class="dt">layout =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/uncertainty-1.png" width="672" /></p>
+<div class="note">
+<p>Looks like the RMSE uncertainty was worst for ‘lm’ and best for ‘fit_knn’</p>
+</div>
+<p>It seems that the model uncertainty for the outcome is fairly narrow for all models. We can (and in a real setting should) do further explorations to decide which model to choose. This is based part on what the model results are, and part on what we want. If we want a very simple, interpretable model, we’d likely use the linear model. If we want a model that has better performance, we might use MARS or - with the un-processed dataset - KNN.</p>
+</div>
+<div id="residual-plots" class="section level2">
+<h2>Residual plots</h2>
+<p>For this exercise, let’s just pick one model. We’ll go with the best performing one, namely KNN (fit to non-pre-processed data). Let’s take a look at the residual plot.</p>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb123-1" data-line-number="1"><span class="co">#Write code to get model predictions for the outcome on the training data, and plot it as function of actual outcome values.</span></a>
+<a class="sourceLine" id="cb123-2" data-line-number="2">data_train<span class="op">$</span>PredictKNN &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_knn)</a>
+<a class="sourceLine" id="cb123-3" data-line-number="3"><span class="kw">ggplot</span>(data_train, <span class="kw">aes</span>(<span class="dt">y =</span> PredictKNN, <span class="dt">x =</span> fracinf)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb123-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb123-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Actual Infection Rate&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Predicted Infection Rate&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Predictions vs. Actual for KNN on Unprocessed Data&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb123-6" data-line-number="6"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb124-1" data-line-number="1"><span class="co">#also compute residuals (the difference between prediction and actual outcome) and plot that</span></a>
+<a class="sourceLine" id="cb124-2" data-line-number="2">data_train<span class="op">$</span>ResidKNN &lt;-<span class="st"> </span><span class="kw">residuals</span>(fit_knn)</a>
+<a class="sourceLine" id="cb124-3" data-line-number="3"><span class="kw">ggplot</span>(data_train, <span class="kw">aes</span>(<span class="dt">y =</span> ResidKNN, <span class="dt">x =</span> fracinf)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb124-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb124-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Actual Infection Rate&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Residuals vs. Actual Infection Rate for KNN on Unprocessed Data&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb124-6" data-line-number="6"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<div class="note">
+<p>My residual plots show an increasing pattern, so I clearly did something wrong! Plus I have all those records where the actual infection rate was 100 and those are pulling the residual trend up</p>
+</div>
+<p>Both plots look ok, predicted vs. outcome is along the 45-degree line, and the residual plot shows no major pattern. Of course, for a real analysis, we would again want to dig a bit deeper. But we’ll leave it at this for now.</p>
+</div>
+<div id="final-model-evaluation" class="section level2">
+<h2>Final model evaluation</h2>
+<p>Let’s do a final check, evaluate the performance of our final model on the test set.</p>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb125-1" data-line-number="1"><span class="co">#Write code that computes model predictions and for test data, then compute SSR and RMSE.</span></a>
+<a class="sourceLine" id="cb125-2" data-line-number="2">data_test<span class="op">$</span>PredictKNN &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_knn, data_test)</a>
+<a class="sourceLine" id="cb125-3" data-line-number="3"><span class="kw">library</span>(ModelMetrics)</a>
+<a class="sourceLine" id="cb125-4" data-line-number="4"><span class="kw">rmse</span>(data_test<span class="op">$</span>fracinf, data_test<span class="op">$</span>PredictKNN)</a></code></pre></div>
+<pre><code>## [1] 10.4898</code></pre>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb127-1" data-line-number="1"><span class="co"># 10.49</span></a>
+<a class="sourceLine" id="cb127-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb127-3" data-line-number="3"><span class="co">#using knn</span></a>
+<a class="sourceLine" id="cb127-4" data-line-number="4">(test_knn &lt;-<span class="st"> </span><span class="kw">train</span>(fracinf <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train, <span class="dt">method =</span> <span class="st">&quot;knn&quot;</span>, <span class="dt">trControl =</span> fitControl)) </a></code></pre></div>
+<pre><code>## k-Nearest Neighbors 
+## 
+## 360 samples
+##  20 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 288, 288, 288, 288, 288, 288, ... 
+## Resampling results across tuning parameters:
+## 
+##   k  RMSE      Rsquared   MAE     
+##   5  7.240032  0.9317972  4.673042
+##   7  7.451572  0.9274023  4.829687
+##   9  7.804709  0.9205711  5.141416
+## 
+## RMSE was used to select the optimal model using the smallest value.
+## The final value used for the model was k = 5.</code></pre>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb129-1" data-line-number="1">data_train<span class="op">$</span>PredictKNN &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_knn)</a>
+<a class="sourceLine" id="cb129-2" data-line-number="2"><span class="kw">ggplot</span>(data_train, <span class="kw">aes</span>(<span class="dt">y =</span> PredictKNN, <span class="dt">x =</span> fracinf)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb129-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb129-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Actual Infection Rate&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Predicted Infection Rate&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Predictions vs. Actual for KNN on Unprocessed Data&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb129-5" data-line-number="5"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb130-1" data-line-number="1"><span class="co">#also compute residuals (the difference between prediction and actual outcome) and plot that</span></a>
+<a class="sourceLine" id="cb130-2" data-line-number="2">data_test<span class="op">$</span>ResidKNN &lt;-<span class="st"> </span>data_test<span class="op">$</span>fracinf <span class="op">-</span><span class="st"> </span>data_test<span class="op">$</span>PredictKNN</a>
+<a class="sourceLine" id="cb130-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb130-4" data-line-number="4"><span class="kw">ggplot</span>(data_test, <span class="kw">aes</span>(<span class="dt">y =</span> ResidKNN, <span class="dt">x =</span> fracinf)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb130-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb130-6" data-line-number="6"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Actual Infection Rate&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Residuals vs. Actual Infection Rate for KNN on Test Data&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb130-7" data-line-number="7"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="Continuous_Outcome_Analysis_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb131-1" data-line-number="1">(SSR &lt;-<span class="st"> </span><span class="kw">sum</span>(data_test<span class="op">$</span>ResidKNN<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
+<pre><code>## [1] 16725.46</code></pre>
+<p>Since we have a different number of observations, the result isn’t expected to be quite the same as for the training data (despite dividing by sample size to account for that). But it’s fairly close, and surprisingly not actually worse. So the KNN model seems to be reasonable at predicting. Now if its performance is ‘good enough’ is a scientific question.</p>
+<p>We will leave it at this, for now, we will likely (re)visit some other topics soon as we perform more such analysis exercises in upcoming weeks. But you are welcome to keep exploring this dataset and try some of the other bits and pieces we covered.</p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
