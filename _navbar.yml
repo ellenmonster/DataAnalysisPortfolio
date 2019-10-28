@@ -11,7 +11,8 @@ left:
         href: ./TidyTuesday.html
       - text: "Continuous Outcome Analysis"
         href: ./Continuous_Outcome_Analysis.html
-      - text: "Future Analysis"
+      - text: "Variable Selection Analysis"
+        href: ./Variable_Selection.html
   - text: "About the Author"
     href: "./Author.html"
 right:
