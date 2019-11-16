@@ -13,6 +13,11 @@ left:
         href: ./Continuous_Outcome_Analysis.html
       - text: "Variable Selection Analysis"
         href: ./Variable_Selection.html
+      - text: "Tree Fitting Analysis"
+        href: ./Tree_Fitting.html
+      - text: "TidyTuesday2: R Packages"
+        href: ./TidyTuesday2.html
+        
   - text: "About the Author"
     href: "./Author.html"
 right:

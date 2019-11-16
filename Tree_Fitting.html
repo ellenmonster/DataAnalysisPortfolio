@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Tree_Fitting.utf8.md</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="customstyles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+}
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Analysis Exercise Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="./Continuous_Outcome_Analysis_copy.html">Continuous Outcome Analysis</a>
+    </li>
+    <li>
+      <a href="./Variable_Selection.html">Variable Selection Analysis</a>
+    </li>
+    <li>
+      <a href="./Tree_Fitting.html">Tree Fitting Analysis</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="./Author.html">About the Author</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/epid8060fall2019/EllenCheng_dataanalysis">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">knitr<span class="op">::</span>opts_chunk<span class="op">$</span><span class="kw">set</span>(<span class="dt">echo =</span> <span class="ot">TRUE</span>, <span class="dt">message =</span> <span class="ot">FALSE</span>, <span class="dt">warning =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div id="overview" class="section level1">
+<h1>Overview</h1>
+<p>This document will guide you through some data analysis tasks with a focus on fitting tree-based models and training them. We’ll also (re)-visit some other topics.</p>
+<p>While this is in some sense a stand-alone analysis, I assume that you have worked through the <em>Data Analysis</em> exercise and are familiar with the dataset and all the things we discovered during the cleaning process. We’ll use the same dataset here but focus on a different outcome. Other than that, the way to work through the exercise is like in the <em>Data Analysis</em> exercise, namely by writing/completing the missing code.</p>
+</div>
+<div id="project-setup" class="section level1">
+<h1>Project setup</h1>
+<p>We need a variety of different packages, which are loaded here. Install as needed. For this analysis, we’ll again use the <code>caret</code> package. If you use others, load them here.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(<span class="st">&#39;tidyr&#39;</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">library</span>(<span class="st">&#39;dplyr&#39;</span>)</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">library</span>(<span class="st">&#39;forcats&#39;</span>)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw">library</span>(<span class="st">&#39;ggplot2&#39;</span>)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="kw">library</span>(<span class="st">&#39;knitr&#39;</span>)</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="kw">library</span>(<span class="st">&#39;doParallel&#39;</span>)</a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="kw">library</span>(<span class="st">&#39;rpart&#39;</span>)</a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="kw">library</span>(<span class="st">&#39;rpart.plot&#39;</span>)</a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="kw">library</span>(<span class="st">&#39;mda&#39;</span>)</a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="kw">library</span>(<span class="st">&#39;ranger&#39;</span>)</a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="kw">library</span>(<span class="st">&#39;e1071&#39;</span>)</a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="kw">library</span>(<span class="st">&#39;tidyverse&#39;</span>)</a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="kw">library</span>(<span class="st">&#39;visdat&#39;</span>)</a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="kw">library</span>(<span class="st">&#39;ggridges&#39;</span>)</a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="kw">library</span>(<span class="st">&#39;gridExtra&#39;</span>)</a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="kw">library</span>(<span class="st">&#39;nnet&#39;</span>)</a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="kw">library</span>(<span class="st">&#39;gbm&#39;</span>)</a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="kw">library</span>(<span class="st">&#39;mlr&#39;</span>)</a>
+<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="kw">library</span>(<span class="st">&#39;caret&#39;</span>)</a>
+<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="kw">library</span>(<span class="st">&#39;expss&#39;</span>)</a></code></pre></div>
+</div>
+<div id="data-loading-and-cleaning" class="section level1">
+<h1>Data loading and cleaning</h1>
+<p>We will again use the Norovirus dataset.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co"># I set &#39;results = &#39;hide&#39; just for this chunk because the output is too long</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">data_raw &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;norodata.csv&quot;</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co"># glimpse(data_raw)</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="kw">summary</span>(data_raw)</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw">dim</span>(data_raw) <span class="co"># 1022 rows, 139 variables</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co"># names(data_raw)</span></a></code></pre></div>
+</div>
+<div id="looking-at-the-outcome" class="section level1">
+<h1>Looking at the outcome</h1>
+<p>For this analysis, we consider as our main outcome of interest the season. This is a categorical outcome with more than 2 categories, something we haven’t looked at before. Because it’s more than 2 categories, a basic logistic model won’t work. Fortunately, tree-based models can deal with multiple categories.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co">#write code to take a look at the outcome variable (season)</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co"># View(data_raw$season)</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw">table</span>(data_raw<span class="op">$</span>season) <span class="co"># there are 67 blank</span></a></code></pre></div>
+<pre><code>## 
+##          Fall Spring Summer Winter 
+##     67    164    222    126    443</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">class</span>(data_raw<span class="op">$</span>season)</a></code></pre></div>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>We already knew from previous explorations that some entries do not have a season. We could either code them as “other” and keep them in the model, or remove them. Since it’s hard to see any potential scientific reason why there should be a correlation between an “other” season and some variable, we’ll remove it here.</p>
+<p>We also notice that while winter is dominant (makes sense, we know that norovirus is more common in winter), we got a decent number of outbreaks for each season, so we shouldn’t have a problem with (un)balanced data.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co">#write code that removes all observations that have an empty/missing value for season</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">temp2 &lt;-<span class="st"> </span>data_raw[data_raw<span class="op">$</span>season <span class="op">!=</span><span class="st"> &quot;&quot;</span>, ]</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="kw">table</span>(temp2<span class="op">$</span>season)</a></code></pre></div>
+<pre><code>## 
+##   Fall Spring Summer Winter 
+##    164    222    126    443</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co">#then drop the empty level and check that you have 4 categories for season left</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2">temp2<span class="op">$</span>season &lt;-<span class="st"> </span><span class="kw">factor</span>(temp2<span class="op">$</span>season) <span class="co"># season was a character class before, so no need to drop an empty level. Making it factor now</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="kw">levels</span>(temp2<span class="op">$</span>season)</a></code></pre></div>
+<pre><code>## [1] &quot;Fall&quot;   &quot;Spring&quot; &quot;Summer&quot; &quot;Winter&quot;</code></pre>
+</div>
+<div id="selecting-predictors" class="section level1">
+<h1>Selecting predictors</h1>
+<p>We will pick similar variables as previously, but with some changes. Keep the following variables: <code>Action1, CasesAll, Country, Deaths, EndMonth, GG2C4, Hemisphere, Hospitalizations,  MeanD1, MeanI1, MedianD1, MedianI1, OBYear, Path1, RateAll, RiskAll, Season, Setting, StartMonth, State, Trans1, Vomit.</code></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># write code that retains the above mentioned variables</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co"># sort(names(temp2))</span></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">temp3 &lt;-<span class="st"> </span>temp2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(Action1, CasesAll, Country, Deaths, EndMonth, gg2c4, Hemisphere, Hospitalizations,  MeanD1, MeanI1, MedianD1, MedianI1, OBYear, Path1, RateAll, RiskAll, season, Setting_<span class="dv">1</span>, StartMonth, State, Trans1, Vomit)</a></code></pre></div>
+</div>
+<div id="cleaning-predictors" class="section level1">
+<h1>Cleaning predictors</h1>
+<p>We’ll have to perform the usual cleaning steps. You might have realized by now that even for the same dataset, cleaning steps can differ based on the outcome (and as you see below, the model).</p>
+<p>Let’s first check for missing values.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="co"># write code that looks at missing values</span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw">vis_miss</span>(temp3)</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/check-reduced-data-1.png" width="672" /></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">map</span>(temp3, <span class="op">~</span><span class="kw">sum</span>(<span class="kw">is.na</span>(.)))</a></code></pre></div>
+<pre><code>## $Action1
+## [1] 0
+## 
+## $CasesAll
+## [1] 5
+## 
+## $Country
+## [1] 0
+## 
+## $Deaths
+## [1] 42
+## 
+## $EndMonth
+## [1] 0
+## 
+## $gg2c4
+## [1] 0
+## 
+## $Hemisphere
+## [1] 0
+## 
+## $Hospitalizations
+## [1] 42
+## 
+## $MeanD1
+## [1] 0
+## 
+## $MeanI1
+## [1] 0
+## 
+## $MedianD1
+## [1] 0
+## 
+## $MedianI1
+## [1] 0
+## 
+## $OBYear
+## [1] 0
+## 
+## $Path1
+## [1] 0
+## 
+## $RateAll
+## [1] 104
+## 
+## $RiskAll
+## [1] 116
+## 
+## $season
+## [1] 0
+## 
+## $Setting_1
+## [1] 0
+## 
+## $StartMonth
+## [1] 0
+## 
+## $State
+## [1] 0
+## 
+## $Trans1
+## [1] 0
+## 
+## $Vomit
+## [1] 1</code></pre>
+<div class="note">
+<p>Most of the missing data are in RiskAll (N = 116, 12.15% of records). Most records that have data missing for RiskAll also have data missing for RateAll (N = 104, 10.89% of records). Also missing some data for Hospitalizations (N = 42), Deaths (N = 42), and CasesAll (N = 5), and Vomit (N = 1).</p>
+</div>
+<p>Looks like none of the new variables we included had a ton of missing, so we would probably be ok just removing any observation that has missing data. <strong>However</strong>, tree-based models can deal with missing data in predictors. Therefore, we’ll keep them for now. We’ll later compare how the model does or does not change if we remove those observations.</p>
+<p>Let’s make sure everything has the right format (numeric/integer/factor). Adjust/recode variables as needed. You will likely find that as you convert <code>OBYear</code> to numeric, something doesn’t quite work. Take a look. Fix by removing the observation with the troublesome entry, then convert to numeric. Finally, remove the observations that have 0 as OByear - there are more than 1 now.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="co">#write code that cleans OBYear, convert it to numeric. Remove observations with OBYear = 0. </span></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="kw">table</span>(temp3<span class="op">$</span>OBYear) <span class="co"># there is a record &#39;2002-2007&#39;</span></a></code></pre></div>
+<pre><code>## 
+##         0      1983      1990      1992      1993      1994      1995 
+##         1         1         1         1         6        15         8 
+##      1996      1997      1998      1999      2000      2001      2002 
+##        10        37        76        80        59        46       134 
+## 2002-2007      2003      2004      2005      2006      2007      2008 
+##         1        91       114        66       127        33        15 
+##      2009      2010 
+##        17        16</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">temp4 &lt;-<span class="st"> </span>temp3[temp3<span class="op">$</span>OBYear <span class="op">!=</span><span class="st"> &quot;2002-2007&quot;</span>, ]</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">temp4<span class="op">$</span>OBYear &lt;-<span class="st"> </span><span class="kw">as.integer</span>(temp4<span class="op">$</span>OBYear)</a>
+<a class="sourceLine" id="cb18-3" data-line-number="3">temp5 &lt;-<span class="st"> </span>temp4[temp4<span class="op">$</span>OBYear <span class="op">!=</span><span class="st"> </span><span class="dv">0</span>, ]</a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#also convert any other variables as needed</span></a>
+<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="kw">glimpse</span>(temp5)</a></code></pre></div>
+<pre><code>## Observations: 953
+## Variables: 22
+## $ Action1          &lt;chr&gt; &quot;Unspecified&quot;, &quot;Unspecified&quot;, &quot;Unspecified&quot;, &quot;U…
+## $ CasesAll         &lt;int&gt; 15, 65, 27, 4, 15, 6, 40, 10, 116, 45, 184, 191…
+## $ Country          &lt;chr&gt; &quot;Japan&quot;, &quot;USA&quot;, &quot;Other&quot;, &quot;Other&quot;, &quot;Other&quot;, &quot;Oth…
+## $ Deaths           &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+## $ EndMonth         &lt;int&gt; 12, 9, 0, 0, 0, 0, 0, 0, 11, 11, 11, 11, 12, 0,…
+## $ gg2c4            &lt;chr&gt; &quot;Yes&quot;, &quot;&quot;, &quot;Yes&quot;, &quot;&quot;, &quot;Yes&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;Yes&quot;,…
+## $ Hemisphere       &lt;chr&gt; &quot;Northern&quot;, &quot;Northern&quot;, &quot;Northern&quot;, &quot;Northern&quot;,…
+## $ Hospitalizations &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 5, 10, 3, 0, 0, 0, 0, 0…
+## $ MeanD1           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0…
+## $ MeanI1           &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+## $ MedianD1         &lt;dbl&gt; 0, 36, 0, 0, 0, 0, 0, 0, 0, 48, 37, 24, 0, 0, 0…
+## $ MedianI1         &lt;int&gt; 0, 37, 0, 0, 0, 0, 0, 0, 0, 31, 34, 33, 0, 0, 0…
+## $ OBYear           &lt;int&gt; 1999, 1998, 2006, 2006, 2006, 2006, 2006, 2006,…
+## $ Path1            &lt;chr&gt; &quot;No&quot;, &quot;No&quot;, &quot;Unspecified&quot;, &quot;Unspecified&quot;, &quot;Unsp…
+## $ RateAll          &lt;dbl&gt; 0.000000, 39.814815, 20.769231, 100.000000, 60.…
+## $ RiskAll          &lt;dbl&gt; 0.00000, 108.00000, 130.00000, 4.00000, 25.0000…
+## $ season           &lt;fct&gt; Fall, Fall, Fall, Fall, Fall, Fall, Fall, Fall,…
+## $ Setting_1        &lt;chr&gt; &quot;Daycare Center&quot;, &quot;Boxed lunch, football game&quot;,…
+## $ StartMonth       &lt;int&gt; 11, 9, 9, 10, 11, 11, 11, 11, 11, 11, 11, 11, 1…
+## $ State            &lt;chr&gt; &quot;0&quot;, &quot;NC, FL&quot;, &quot;0&quot;, &quot;0&quot;, &quot;0&quot;, &quot;0&quot;, &quot;0&quot;, &quot;0&quot;, &quot;0…
+## $ Trans1           &lt;chr&gt; &quot;Unspecified&quot;, &quot;Foodborne&quot;, &quot;Foodborne&quot;, &quot;Foodb…
+## $ Vomit            &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…</code></pre>
+<div class="note">
+<p>A few comments:</p>
+<ul>
+<li><p>There was supposed to be more than one OBYear = 0, but I only found one.</p></li>
+<li><p>There are gg2c4 values that are blank, and will need to be converted to “No”</p></li>
+<li><p>I will convert character classes to factors after I’ve finished cleaning the data</p></li>
+<li><p>There are some values of 0 for State–will need to fix that</p></li>
+<li>Seems Vomit should be a factor</li>
+</ul>
+</div>
+<p>Look at the data to see what else we need to do.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">str</span>(temp5)</a></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    953 obs. of  22 variables:
+##  $ Action1         : chr  &quot;Unspecified&quot; &quot;Unspecified&quot; &quot;Unspecified&quot; &quot;Unspecified&quot; ...
+##  $ CasesAll        : int  15 65 27 4 15 6 40 10 116 45 ...
+##  $ Country         : chr  &quot;Japan&quot; &quot;USA&quot; &quot;Other&quot; &quot;Other&quot; ...
+##  $ Deaths          : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ EndMonth        : int  12 9 0 0 0 0 0 0 11 11 ...
+##  $ gg2c4           : chr  &quot;Yes&quot; &quot;&quot; &quot;Yes&quot; &quot;&quot; ...
+##  $ Hemisphere      : chr  &quot;Northern&quot; &quot;Northern&quot; &quot;Northern&quot; &quot;Northern&quot; ...
+##  $ Hospitalizations: int  0 0 0 0 0 0 0 0 5 10 ...
+##  $ MeanD1          : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ MeanI1          : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ MedianD1        : num  0 36 0 0 0 0 0 0 0 48 ...
+##  $ MedianI1        : int  0 37 0 0 0 0 0 0 0 31 ...
+##  $ OBYear          : int  1999 1998 2006 2006 2006 2006 2006 2006 2004 1993 ...
+##  $ Path1           : chr  &quot;No&quot; &quot;No&quot; &quot;Unspecified&quot; &quot;Unspecified&quot; ...
+##  $ RateAll         : num  0 39.8 20.8 100 60 ...
+##  $ RiskAll         : num  0 108 130 4 25 ...
+##  $ season          : Factor w/ 4 levels &quot;Fall&quot;,&quot;Spring&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ Setting_1       : chr  &quot;Daycare Center&quot; &quot;Boxed lunch, football game&quot; &quot;buffet&quot; &quot;restaurant&quot; ...
+##  $ StartMonth      : int  11 9 9 10 11 11 11 11 11 11 ...
+##  $ State           : chr  &quot;0&quot; &quot;NC, FL&quot; &quot;0&quot; &quot;0&quot; ...
+##  $ Trans1          : chr  &quot;Unspecified&quot; &quot;Foodborne&quot; &quot;Foodborne&quot; &quot;Foodborne&quot; ...
+##  $ Vomit           : int  1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw">summary</span>(temp5)</a></code></pre></div>
+<pre><code>##    Action1             CasesAll       Country              Deaths       
+##  Length:953         Min.   :    1   Length:953         Min.   :0.00000  
+##  Class :character   1st Qu.:    9   Class :character   1st Qu.:0.00000  
+##  Mode  :character   Median :   25   Mode  :character   Median :0.00000  
+##                     Mean   :  129                      Mean   :0.05379  
+##                     3rd Qu.:   64                      3rd Qu.:0.00000  
+##                     Max.   :32150                      Max.   :9.00000  
+##                     NA&#39;s   :5                          NA&#39;s   :42       
+##     EndMonth         gg2c4            Hemisphere        Hospitalizations  
+##  Min.   : 0.000   Length:953         Length:953         Min.   :  0.0000  
+##  1st Qu.: 0.000   Class :character   Class :character   1st Qu.:  0.0000  
+##  Median : 0.000   Mode  :character   Mode  :character   Median :  0.0000  
+##  Mean   : 2.559                                         Mean   :  0.7113  
+##  3rd Qu.: 4.000                                         3rd Qu.:  0.0000  
+##  Max.   :12.000                                         Max.   :125.0000  
+##                                                         NA&#39;s   :42        
+##      MeanD1            MeanI1           MedianD1          MedianI1     
+##  Min.   :  0.000   Min.   : 0.0000   Min.   :  0.000   Min.   : 0.000  
+##  1st Qu.:  0.000   1st Qu.: 0.0000   1st Qu.:  0.000   1st Qu.: 0.000  
+##  Median :  0.000   Median : 0.0000   Median :  0.000   Median : 0.000  
+##  Mean   :  1.558   Mean   : 0.7125   Mean   :  2.611   Mean   : 1.703  
+##  3rd Qu.:  0.000   3rd Qu.: 0.0000   3rd Qu.:  0.000   3rd Qu.: 0.000  
+##  Max.   :273.600   Max.   :48.0000   Max.   :235.200   Max.   :65.000  
+##                                                                        
+##      OBYear        Path1              RateAll          RiskAll       
+##  Min.   :1983   Length:953         Min.   :  0.00   Min.   :    0.0  
+##  1st Qu.:2000   Class :character   1st Qu.:  0.00   1st Qu.:    0.0  
+##  Median :2003   Mode  :character   Median : 16.50   Median :   20.5  
+##  Mean   :2002                      Mean   : 27.04   Mean   :  399.7  
+##  3rd Qu.:2005                      3rd Qu.: 49.00   3rd Qu.:  110.8  
+##  Max.   :2010                      Max.   :105.00   Max.   :35000.0  
+##                                    NA&#39;s   :103      NA&#39;s   :115      
+##     season     Setting_1           StartMonth        State          
+##  Fall  :164   Length:953         Min.   : 0.000   Length:953        
+##  Spring:222   Class :character   1st Qu.: 2.000   Class :character  
+##  Summer:125   Mode  :character   Median : 5.000   Mode  :character  
+##  Winter:442                      Mean   : 5.894                     
+##                                  3rd Qu.:10.000                     
+##                                  Max.   :12.000                     
+##                                                                     
+##     Trans1              Vomit       
+##  Length:953         Min.   :0.0000  
+##  Class :character   1st Qu.:0.0000  
+##  Mode  :character   Median :1.0000  
+##                     Mean   :0.5074  
+##                     3rd Qu.:1.0000  
+##                     Max.   :1.0000  
+##                     NA&#39;s   :1</code></pre>
+<p>Some issues we noted previously: We need to remove the <code>Unspecified</code> entry in <code>Hemisphere</code> and recode <code>Action1</code> and <code>Path1</code> as described in the <em>Data Analysis exercise</em>, i.e., from <code>Unknown</code> to <code>Unspecified</code>. Also, we want to group the <code>Setting_1</code> variable into just <code>Restaurant</code> and <code>Other</code>. Again, remember that there are <code>restaurant</code> and <code>Restaurant</code> values, so you need to fix that too.</p>
+<p>We’ll also recode the gg2c4 blank entries to “No”. We further note that <code>Action1</code> has a single <code>No</code> entry. Let’s remove that observation to prevent potential problems during cross-validation.</p>
+<p>Let’s also lump country together, make 3 categories, Japan, USA, and Other.</p>
+<p>As discussed previously, it makes sense to move the Waterborne to the Environmental in the <code>Trans1</code> variable. It also turns out that most outbreaks have no information for state, so best to drop the <code>State</code> variable.</p>
+<p>Finally, move the outcome into the first column.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co"># write code that performs the actions described above</span></a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="co"># Drop records with &#39;Unspecified&#39; for &#39;Hemisphere&#39;</span></a>
+<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="kw">unique</span>(temp5<span class="op">$</span>Hemisphere) <span class="co"># I don&#39;t see any &quot;Unspecified&quot;</span></a></code></pre></div>
+<pre><code>## [1] &quot;Northern&quot; &quot;Southern&quot;</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="co"># View(data_raw[data_raw$Hemisphere==&quot;Unspecified&quot;, ]) # oh, so the records with &quot;Unspecified&quot; were already dropped earlier</span></a>
+<a class="sourceLine" id="cb26-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb26-3" data-line-number="3"><span class="co"># Combine &#39;Unknown&#39; and &#39;Unspecified&#39;</span></a>
+<a class="sourceLine" id="cb26-4" data-line-number="4"><span class="kw">table</span>(temp5<span class="op">$</span>Action1)</a></code></pre></div>
+<pre><code>## 
+##          No     Unknown Unspecified         Yes 
+##           1           1         742         209</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">temp5<span class="op">$</span>Action1[temp5<span class="op">$</span>Action1 <span class="op">==</span><span class="st"> &quot;Unknown&quot;</span>] &lt;-<span class="st"> &quot;Unspecified&quot;</span></a>
+<a class="sourceLine" id="cb28-2" data-line-number="2"><span class="kw">table</span>(temp5<span class="op">$</span>Action1)</a></code></pre></div>
+<pre><code>## 
+##          No Unspecified         Yes 
+##           1         743         209</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw">table</span>(temp5<span class="op">$</span>Path1)</a></code></pre></div>
+<pre><code>## 
+##          No     Unknown Unspecified         Yes 
+##         197           3         675          78</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1">temp5<span class="op">$</span>Path1[temp5<span class="op">$</span>Path1 <span class="op">==</span><span class="st"> &quot;Unknown&quot;</span>] &lt;-<span class="st"> &quot;Unspecified&quot;</span></a>
+<a class="sourceLine" id="cb32-2" data-line-number="2"><span class="kw">table</span>(temp5<span class="op">$</span>Path1)</a></code></pre></div>
+<pre><code>## 
+##          No Unspecified         Yes 
+##         197         678          78</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1"><span class="co"># Reclassify &#39;Setting1&#39;</span></a>
+<a class="sourceLine" id="cb34-2" data-line-number="2"><span class="co"># unique(temp5$Setting_1)  # I commented this out after looking at it, because it would take too much space in the output</span></a>
+<a class="sourceLine" id="cb34-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb34-4" data-line-number="4">(<span class="kw">c</span>(<span class="st">&quot;Sub Restaruant&quot;</span>, <span class="st">&quot;Resaurant&quot;</span>, <span class="kw">unique</span>(temp5<span class="op">$</span>Setting_<span class="dv">1</span>)[<span class="kw">grep</span>(<span class="st">&quot;restaurant&quot;</span>, <span class="kw">unique</span>(temp5<span class="op">$</span>Setting_<span class="dv">1</span>), <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>)])) <span class="co"># These are the 12 categories that can be considered &quot;Restaurant&quot;</span></a></code></pre></div>
+<pre><code>##  [1] &quot;Sub Restaruant&quot;                                                   
+##  [2] &quot;Resaurant&quot;                                                        
+##  [3] &quot;restaurant&quot;                                                       
+##  [4] &quot;take-out restaurant&quot;                                              
+##  [5] &quot;annual festival, oyster roast, banquet, restaurant, church supper&quot;
+##  [6] &quot;Restaurant&quot;                                                       
+##  [7] &quot;Catering service in Restaurant&quot;                                   
+##  [8] &quot;restaurant in Cabarrus county&quot;                                    
+##  [9] &quot;restaurant in Clay county&quot;                                        
+## [10] &quot;restaurant in Northern Territory&quot;                                 
+## [11] &quot;Shared meal at a restaurant&quot;                                      
+## [12] &quot;restaurants, sports and community clubs, and a private function&quot;  
+## [13] &quot;restaurant; catered party&quot;</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1">temp6 &lt;-<span class="st"> </span>temp5 <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb36-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Setting_1 =</span> <span class="kw">ifelse</span>(Setting_<span class="dv">1</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Sub Restaruant&quot;</span>, <span class="st">&quot;Resaurant&quot;</span>, <span class="kw">unique</span>(temp5<span class="op">$</span>Setting_<span class="dv">1</span>)[<span class="kw">grep</span>(<span class="st">&quot;restaurant&quot;</span>, <span class="kw">unique</span>(temp5<span class="op">$</span>Setting_<span class="dv">1</span>), <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>)]), <span class="st">&quot;Restaurant&quot;</span>, <span class="st">&quot;Other&quot;</span>))</a>
+<a class="sourceLine" id="cb36-3" data-line-number="3"><span class="kw">table</span>(temp6<span class="op">$</span>Setting_<span class="dv">1</span>) <span class="co">#188 Restaurant, 765 Other</span></a></code></pre></div>
+<pre><code>## 
+##      Other Restaurant 
+##        765        188</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="co"># Change gg2c4 blank entries to &quot;No&quot;</span></a>
+<a class="sourceLine" id="cb38-2" data-line-number="2">temp6<span class="op">$</span>gg2c4[temp6<span class="op">$</span>gg2c4<span class="op">==</span><span class="st">&quot;&quot;</span>] &lt;-<span class="st"> &quot;No&quot;</span></a>
+<a class="sourceLine" id="cb38-3" data-line-number="3"><span class="kw">table</span>(temp6<span class="op">$</span>gg2c4) <span class="co"># 676 No, 277 Yes</span></a></code></pre></div>
+<pre><code>## 
+##  No Yes 
+## 676 277</code></pre>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="co"># Remove the observation for which Action1 is &quot;No&quot;</span></a>
+<a class="sourceLine" id="cb40-2" data-line-number="2">temp6 &lt;-<span class="st"> </span>temp6 <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb40-3" data-line-number="3"><span class="st">  </span><span class="kw">filter</span>(Action1 <span class="op">!=</span><span class="st"> &quot;No&quot;</span>)</a>
+<a class="sourceLine" id="cb40-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb40-5" data-line-number="5"><span class="co"># Combine Countries into 3 groups: Japan/USA/Other</span></a>
+<a class="sourceLine" id="cb40-6" data-line-number="6">temp6<span class="op">$</span>Country[<span class="op">!</span>temp6<span class="op">$</span>Country <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Japan&quot;</span>, <span class="st">&quot;USA&quot;</span>)] &lt;-<span class="st"> &quot;Other&quot;</span> </a>
+<a class="sourceLine" id="cb40-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb40-8" data-line-number="8"><span class="co"># Move the Waterborne into the environmental transmission</span></a>
+<a class="sourceLine" id="cb40-9" data-line-number="9">temp6<span class="op">$</span>Trans1[temp6<span class="op">$</span>Trans1<span class="op">==</span><span class="st">&quot;Waterborne&quot;</span>] &lt;-<span class="st"> &quot;Environmental&quot;</span> <span class="co"># changed 72 entries</span></a>
+<a class="sourceLine" id="cb40-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb40-11" data-line-number="11"><span class="co"># Drop the &#39;state&#39; variable</span></a>
+<a class="sourceLine" id="cb40-12" data-line-number="12">temp6<span class="op">$</span>State  &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb40-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb40-14" data-line-number="14"><span class="co"># Check the data again</span></a>
+<a class="sourceLine" id="cb40-15" data-line-number="15"><span class="kw">glimpse</span>(temp6)</a></code></pre></div>
+<pre><code>## Observations: 952
+## Variables: 21
+## $ Action1          &lt;chr&gt; &quot;Unspecified&quot;, &quot;Unspecified&quot;, &quot;Unspecified&quot;, &quot;U…
+## $ CasesAll         &lt;int&gt; 15, 65, 27, 4, 15, 6, 40, 10, 116, 45, 184, 191…
+## $ Country          &lt;chr&gt; &quot;Japan&quot;, &quot;USA&quot;, &quot;Other&quot;, &quot;Other&quot;, &quot;Other&quot;, &quot;Oth…
+## $ Deaths           &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+## $ EndMonth         &lt;int&gt; 12, 9, 0, 0, 0, 0, 0, 0, 11, 11, 11, 11, 12, 0,…
+## $ gg2c4            &lt;chr&gt; &quot;Yes&quot;, &quot;No&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;Yes&quot;, &quot;No&quot;, &quot;No&quot;, &quot;N…
+## $ Hemisphere       &lt;chr&gt; &quot;Northern&quot;, &quot;Northern&quot;, &quot;Northern&quot;, &quot;Northern&quot;,…
+## $ Hospitalizations &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 5, 10, 3, 0, 0, 0, 0, 0…
+## $ MeanD1           &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0…
+## $ MeanI1           &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+## $ MedianD1         &lt;dbl&gt; 0, 36, 0, 0, 0, 0, 0, 0, 0, 48, 37, 24, 0, 0, 0…
+## $ MedianI1         &lt;int&gt; 0, 37, 0, 0, 0, 0, 0, 0, 0, 31, 34, 33, 0, 0, 0…
+## $ OBYear           &lt;int&gt; 1999, 1998, 2006, 2006, 2006, 2006, 2006, 2006,…
+## $ Path1            &lt;chr&gt; &quot;No&quot;, &quot;No&quot;, &quot;Unspecified&quot;, &quot;Unspecified&quot;, &quot;Unsp…
+## $ RateAll          &lt;dbl&gt; 0.000000, 39.814815, 20.769231, 100.000000, 60.…
+## $ RiskAll          &lt;dbl&gt; 0.00000, 108.00000, 130.00000, 4.00000, 25.0000…
+## $ season           &lt;fct&gt; Fall, Fall, Fall, Fall, Fall, Fall, Fall, Fall,…
+## $ Setting_1        &lt;chr&gt; &quot;Other&quot;, &quot;Other&quot;, &quot;Other&quot;, &quot;Restaurant&quot;, &quot;Other…
+## $ StartMonth       &lt;int&gt; 11, 9, 9, 10, 11, 11, 11, 11, 11, 11, 11, 11, 1…
+## $ Trans1           &lt;chr&gt; &quot;Unspecified&quot;, &quot;Foodborne&quot;, &quot;Foodborne&quot;, &quot;Foodb…
+## $ Vomit            &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1">temp6 &lt;-<span class="st"> </span>temp6 <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb42-2" data-line-number="2"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate_if</span>(is.character, as.factor)</a>
+<a class="sourceLine" id="cb42-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb42-4" data-line-number="4">temp6<span class="op">$</span>Vomit &lt;-<span class="st"> </span><span class="kw">factor</span>(temp6<span class="op">$</span>Vomit)</a>
+<a class="sourceLine" id="cb42-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb42-6" data-line-number="6"><span class="kw">summary</span>(temp6)</a></code></pre></div>
+<pre><code>##         Action1       CasesAll        Country        Deaths       
+##  Unspecified:743   Min.   :    1.0   Japan:371   Min.   :0.00000  
+##  Yes        :209   1st Qu.:    9.0   Other:475   1st Qu.:0.00000  
+##                    Median :   25.0   USA  :106   Median :0.00000  
+##                    Mean   :  129.0               Mean   :0.05385  
+##                    3rd Qu.:   63.5               3rd Qu.:0.00000  
+##                    Max.   :32150.0               Max.   :9.00000  
+##                    NA&#39;s   :5                     NA&#39;s   :42       
+##     EndMonth      gg2c4        Hemisphere  Hospitalizations  
+##  Min.   : 0.000   No :676   Northern:872   Min.   :  0.0000  
+##  1st Qu.: 0.000   Yes:276   Southern: 80   1st Qu.:  0.0000  
+##  Median : 0.000                            Median :  0.0000  
+##  Mean   : 2.555                            Mean   :  0.7121  
+##  3rd Qu.: 4.000                            3rd Qu.:  0.0000  
+##  Max.   :12.000                            Max.   :125.0000  
+##                                            NA&#39;s   :42        
+##      MeanD1           MeanI1           MedianD1          MedianI1     
+##  Min.   :  0.00   Min.   : 0.0000   Min.   :  0.000   Min.   : 0.000  
+##  1st Qu.:  0.00   1st Qu.: 0.0000   1st Qu.:  0.000   1st Qu.: 0.000  
+##  Median :  0.00   Median : 0.0000   Median :  0.000   Median : 0.000  
+##  Mean   :  1.56   Mean   : 0.7132   Mean   :  2.614   Mean   : 1.705  
+##  3rd Qu.:  0.00   3rd Qu.: 0.0000   3rd Qu.:  0.000   3rd Qu.: 0.000  
+##  Max.   :273.60   Max.   :48.0000   Max.   :235.200   Max.   :65.000  
+##                                                                       
+##      OBYear             Path1        RateAll          RiskAll       
+##  Min.   :1983   No         :197   Min.   :  0.00   Min.   :    0.0  
+##  1st Qu.:2000   Unspecified:677   1st Qu.:  0.00   1st Qu.:    0.0  
+##  Median :2003   Yes        : 78   Median : 16.50   Median :   20.5  
+##  Mean   :2002                     Mean   : 27.04   Mean   :  399.7  
+##  3rd Qu.:2005                     3rd Qu.: 49.00   3rd Qu.:  110.8  
+##  Max.   :2010                     Max.   :105.00   Max.   :35000.0  
+##                                   NA&#39;s   :102      NA&#39;s   :114      
+##     season         Setting_1     StartMonth                  Trans1   
+##  Fall  :164   Other     :764   Min.   : 0.000   Environmental   : 83  
+##  Spring:222   Restaurant:188   1st Qu.: 2.000   Foodborne       :373  
+##  Summer:125                    Median : 5.000   Person to Person:150  
+##  Winter:441                    Mean   : 5.894   Unknown         : 63  
+##                                3rd Qu.:10.000   Unspecified     :283  
+##                                Max.   :12.000                         
+##                                                                       
+##   Vomit    
+##  0   :469  
+##  1   :482  
+##  NA&#39;s:  1  
+##            
+##            
+##            
+## </code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1">d &lt;-<span class="st"> </span>temp6 <span class="co"># This is the final dataset</span></a>
+<a class="sourceLine" id="cb44-2" data-line-number="2">d<span class="op">$</span>season &lt;-<span class="st"> </span><span class="kw">factor</span>(d<span class="op">$</span>season, <span class="kw">c</span>(<span class="st">&quot;Spring&quot;</span>, <span class="st">&quot;Summer&quot;</span>, <span class="st">&quot;Fall&quot;</span>, <span class="st">&quot;Winter&quot;</span>))</a>
+<a class="sourceLine" id="cb44-3" data-line-number="3">d &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb44-4" data-line-number="4"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(season, <span class="kw">everything</span>())</a>
+<a class="sourceLine" id="cb44-5" data-line-number="5">d &lt;-<span class="st"> </span><span class="kw">droplevels</span>(d)</a>
+<a class="sourceLine" id="cb44-6" data-line-number="6"><span class="co"># at the end, use the droplevels() command to remove empty factor levels</span></a></code></pre></div>
+<div class="note">
+<p>There was no need to remove records of “Unspecified” for the “Hemisphere” variable, because there were no such entries. Turns out, there were two “Unspecified” in the original data but one record had a blank entry for “Season” (so was discarded) and another had OBYear = 0 (so was discarded).</p>
+</div>
+</div>
+<div id="data-visualization" class="section level1">
+<h1>Data visualization</h1>
+<p>We know our data fairly well by now, so we might not discover much new in any plots, but it’s always good to do them anyway. Let’s create a few plots showing the outcome and the predictors. We’ll start with the continuous predictors. I suggest scatter/box/violin plots with the outcome on the x-axis.</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1"><span class="co"># Write code that produces plots showing our outcome of interest on the x-axis and each numeric predictor on the y-axis.</span></a>
+<a class="sourceLine" id="cb45-2" data-line-number="2"><span class="co"># Check the distribution of continuous predictors. Outcome is &quot;season&quot;</span></a>
+<a class="sourceLine" id="cb45-3" data-line-number="3">(numeric_var &lt;-<span class="st"> </span><span class="kw">select_if</span>(d, is.numeric) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">names</span>()) <span class="co"># These are the numeric variables</span></a></code></pre></div>
+<pre><code>##  [1] &quot;CasesAll&quot;         &quot;Deaths&quot;           &quot;EndMonth&quot;        
+##  [4] &quot;Hospitalizations&quot; &quot;MeanD1&quot;           &quot;MeanI1&quot;          
+##  [7] &quot;MedianD1&quot;         &quot;MedianI1&quot;         &quot;OBYear&quot;          
+## [10] &quot;RateAll&quot;          &quot;RiskAll&quot;          &quot;StartMonth&quot;</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1">ridge_list &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb47-2" data-line-number="2"><span class="cf">for</span>(i <span class="cf">in</span> numeric_var) {</a>
+<a class="sourceLine" id="cb47-3" data-line-number="3">  ridge_list[[i]] &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> d[, <span class="kw">c</span>(<span class="st">&quot;season&quot;</span>, i)], <span class="kw">aes_string</span>(<span class="dt">x =</span> i, <span class="dt">y =</span> <span class="st">&quot;season&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;season&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;season&quot;</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb47-4" data-line-number="4"><span class="st">    </span><span class="kw">geom_density_ridges</span>(<span class="dt">alpha =</span> <span class="fl">0.4</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb47-5" data-line-number="5"><span class="st">    </span><span class="kw">labs</span>(<span class="dt">x =</span> i) <span class="op">+</span></a>
+<a class="sourceLine" id="cb47-6" data-line-number="6"><span class="st">    </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb47-7" data-line-number="7"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb47-8" data-line-number="8">}</a>
+<a class="sourceLine" id="cb47-9" data-line-number="9"><span class="kw">do.call</span>(<span class="st">&quot;grid.arrange&quot;</span>, <span class="kw">c</span>(ridge_list, <span class="dt">ncol=</span><span class="dv">3</span>, <span class="dt">top =</span> <span class="st">&quot;Distribution of continuous variables, color-coded by season&quot;</span>))</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/plots-1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="co"># Box plots of continuous predictors</span></a>
+<a class="sourceLine" id="cb48-2" data-line-number="2">box_list &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb48-3" data-line-number="3"><span class="cf">for</span>(i <span class="cf">in</span> numeric_var) {</a>
+<a class="sourceLine" id="cb48-4" data-line-number="4">  box_list[[i]] &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> d[, <span class="kw">c</span>(<span class="st">&quot;season&quot;</span>, i)], <span class="kw">aes_string</span>(<span class="dt">y =</span> i, <span class="dt">x =</span> <span class="st">&quot;season&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;season&quot;</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb48-5" data-line-number="5"><span class="st">    </span><span class="kw">geom_boxplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb48-6" data-line-number="6"><span class="st">    </span><span class="kw">labs</span>(<span class="dt">y =</span> i) <span class="op">+</span></a>
+<a class="sourceLine" id="cb48-7" data-line-number="7"><span class="st">    </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb48-8" data-line-number="8"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb48-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb48-10" data-line-number="10"><span class="kw">do.call</span>(<span class="st">&quot;grid.arrange&quot;</span>, <span class="kw">c</span>(box_list, <span class="dt">ncol=</span><span class="dv">3</span>, <span class="dt">top =</span> <span class="st">&quot;Box plots of continuous variables, color-coded by season&quot;</span>))</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/plots-1-2.png" width="672" /></p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="co"># Violin plots of continuous predictors</span></a>
+<a class="sourceLine" id="cb49-2" data-line-number="2">violin_list &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb49-3" data-line-number="3"><span class="cf">for</span>(i <span class="cf">in</span> numeric_var) {</a>
+<a class="sourceLine" id="cb49-4" data-line-number="4">  violin_list[[i]] &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> d[, <span class="kw">c</span>(<span class="st">&quot;season&quot;</span>, i)], <span class="kw">aes_string</span>(<span class="dt">y =</span> i, <span class="dt">x =</span> <span class="st">&quot;season&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;season&quot;</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb49-5" data-line-number="5"><span class="st">    </span><span class="kw">geom_violin</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb49-6" data-line-number="6"><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">alpha =</span> <span class="fl">0.2</span>, <span class="dt">width =</span> <span class="fl">0.1</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb49-7" data-line-number="7"><span class="st">    </span><span class="kw">labs</span>(<span class="dt">y =</span> i) <span class="op">+</span></a>
+<a class="sourceLine" id="cb49-8" data-line-number="8"><span class="st">    </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb49-9" data-line-number="9"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb49-10" data-line-number="10">}</a>
+<a class="sourceLine" id="cb49-11" data-line-number="11"><span class="kw">do.call</span>(<span class="st">&quot;grid.arrange&quot;</span>, <span class="kw">c</span>(violin_list, <span class="dt">ncol=</span><span class="dv">3</span>, <span class="dt">top =</span> <span class="st">&quot;Violin plots of continuous variables, color-coded by season&quot;</span>))</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/plots-1-3.png" width="672" /></p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="co">#you can use the facet_wrap functionality in ggplot for it, or do it some other way.</span></a></code></pre></div>
+<div class="notes">
+<p>Notes:</p>
+<ul>
+<li><p>Distribution of “EndMonth” is bimodal for all seasons</p></li>
+<li><p>Distribution of “StartMonth” is multi-model for all seasons</p></li>
+<li>A lot of predictors are left-skewed Things look ok, apart from the skew in the predictors we discussed previously.</li>
+</ul>
+</div>
+<p>Next, let’s create plots for the categorical variables. You can use, for instance, <code>geom_count</code> for it, or some other representation. If you prefer lots of tables, that’s ok too.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="co">#write code that produces plots or tables showing our outcome of interest and each categorical predictor.</span></a>
+<a class="sourceLine" id="cb51-2" data-line-number="2">(categ_var &lt;-<span class="st"> </span><span class="kw">select_if</span>(d, is.factor) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">names</span>())</a></code></pre></div>
+<pre><code>## [1] &quot;season&quot;     &quot;Action1&quot;    &quot;Country&quot;    &quot;gg2c4&quot;      &quot;Hemisphere&quot;
+## [6] &quot;Path1&quot;      &quot;Setting_1&quot;  &quot;Trans1&quot;     &quot;Vomit&quot;</code></pre>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1">categ_var &lt;-<span class="st"> </span>categ_var[categ_var <span class="op">!=</span><span class="st"> &quot;season&quot;</span>]</a>
+<a class="sourceLine" id="cb53-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb53-3" data-line-number="3"><span class="co"># Tables of categorical predictors</span></a>
+<a class="sourceLine" id="cb53-4" data-line-number="4"><span class="cf">for</span>(i <span class="cf">in</span> categ_var) {</a>
+<a class="sourceLine" id="cb53-5" data-line-number="5">  <span class="kw">print</span>(<span class="kw">kable</span>(<span class="kw">table</span>(d[[i]], d[[<span class="st">&quot;season&quot;</span>]]), <span class="dt">caption =</span> <span class="kw">paste0</span>(<span class="st">&quot;Count of &quot;</span>, i, <span class="st">&quot; by season&quot;</span>)))</a>
+<a class="sourceLine" id="cb53-6" data-line-number="6">}</a></code></pre></div>
+<pre><code>## 
+## 
+## Table: Count of Action1 by season
+## 
+##                Spring   Summer   Fall   Winter
+## ------------  -------  -------  -----  -------
+## Unspecified       182       82    117      362
+## Yes                40       43     47       79
+## 
+## 
+## Table: Count of Country by season
+## 
+##          Spring   Summer   Fall   Winter
+## ------  -------  -------  -----  -------
+## Japan        89       11     28      243
+## Other       106       96    107      166
+## USA          27       18     29       32
+## 
+## 
+## Table: Count of gg2c4 by season
+## 
+##        Spring   Summer   Fall   Winter
+## ----  -------  -------  -----  -------
+## No        177       96    103      300
+## Yes        45       29     61      141
+## 
+## 
+## Table: Count of Hemisphere by season
+## 
+##             Spring   Summer   Fall   Winter
+## ---------  -------  -------  -----  -------
+## Northern       202      104    144      422
+## Southern        20       21     20       19
+## 
+## 
+## Table: Count of Path1 by season
+## 
+##                Spring   Summer   Fall   Winter
+## ------------  -------  -------  -----  -------
+## No                 45       28     34       90
+## Unspecified       158       81    115      323
+## Yes                19       16     15       28
+## 
+## 
+## Table: Count of Setting_1 by season
+## 
+##               Spring   Summer   Fall   Winter
+## -----------  -------  -------  -----  -------
+## Other            179      109    137      339
+## Restaurant        43       16     27      102
+## 
+## 
+## Table: Count of Trans1 by season
+## 
+##                     Spring   Summer   Fall   Winter
+## -----------------  -------  -------  -----  -------
+## Environmental           18       27      9       29
+## Foodborne               81       46     65      181
+## Person to Person        41       21     28       60
+## Unknown                 22        7      7       27
+## Unspecified             60       24     55      144
+## 
+## 
+## Table: Count of Vomit by season
+## 
+##       Spring   Summer   Fall   Winter
+## ---  -------  -------  -----  -------
+## 0        114       50     81      224
+## 1        108       75     83      216</code></pre>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="co"># Bar plots</span></a>
+<a class="sourceLine" id="cb55-2" data-line-number="2">bar_list &lt;-<span class="st"> </span><span class="kw">list</span>()</a>
+<a class="sourceLine" id="cb55-3" data-line-number="3"><span class="cf">for</span>(i <span class="cf">in</span> categ_var) {</a>
+<a class="sourceLine" id="cb55-4" data-line-number="4">  bar_list[[i]] &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> d[, <span class="kw">c</span>(<span class="st">&quot;season&quot;</span>, i)], <span class="kw">aes</span>(<span class="dt">x =</span> season)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb55-5" data-line-number="5"><span class="st">    </span><span class="kw">geom_bar</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-6" data-line-number="6"><span class="st">    </span><span class="kw">labs</span>(<span class="dt">y =</span> i) <span class="op">+</span></a>
+<a class="sourceLine" id="cb55-7" data-line-number="7"><span class="st">    </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb55-8" data-line-number="8"><span class="st">    </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a>
+<a class="sourceLine" id="cb55-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb55-10" data-line-number="10"><span class="kw">do.call</span>(<span class="st">&quot;grid.arrange&quot;</span>, <span class="kw">c</span>(bar_list, <span class="dt">ncol=</span><span class="dv">3</span>, <span class="dt">top =</span> <span class="st">&quot;Bar plots of categorical variables, by season&quot;</span>))</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/plots-2-1.png" width="672" /></p>
+<p>Looks ok. Notice the NA for vomiting. We are ok with that for now.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1"><span class="kw">dim</span>(d)</a></code></pre></div>
+<pre><code>## [1] 952  21</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1"><span class="kw">str</span>(d)</a></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    952 obs. of  21 variables:
+##  $ season          : Factor w/ 4 levels &quot;Spring&quot;,&quot;Summer&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ Action1         : Factor w/ 2 levels &quot;Unspecified&quot;,..: 1 1 1 1 1 1 1 1 1 2 ...
+##  $ CasesAll        : int  15 65 27 4 15 6 40 10 116 45 ...
+##  $ Country         : Factor w/ 3 levels &quot;Japan&quot;,&quot;Other&quot;,..: 1 3 2 2 2 2 2 2 2 3 ...
+##  $ Deaths          : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ EndMonth        : int  12 9 0 0 0 0 0 0 11 11 ...
+##  $ gg2c4           : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 2 1 2 1 2 1 1 1 2 1 ...
+##  $ Hemisphere      : Factor w/ 2 levels &quot;Northern&quot;,&quot;Southern&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ Hospitalizations: int  0 0 0 0 0 0 0 0 5 10 ...
+##  $ MeanD1          : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ MeanI1          : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ MedianD1        : num  0 36 0 0 0 0 0 0 0 48 ...
+##  $ MedianI1        : int  0 37 0 0 0 0 0 0 0 31 ...
+##  $ OBYear          : int  1999 1998 2006 2006 2006 2006 2006 2006 2004 1993 ...
+##  $ Path1           : Factor w/ 3 levels &quot;No&quot;,&quot;Unspecified&quot;,..: 1 1 2 2 2 2 2 2 1 2 ...
+##  $ RateAll         : num  0 39.8 20.8 100 60 ...
+##  $ RiskAll         : num  0 108 130 4 25 ...
+##  $ Setting_1       : Factor w/ 2 levels &quot;Other&quot;,&quot;Restaurant&quot;: 1 1 1 2 1 2 1 2 1 1 ...
+##  $ StartMonth      : int  11 9 9 10 11 11 11 11 11 11 ...
+##  $ Trans1          : Factor w/ 5 levels &quot;Environmental&quot;,..: 5 2 2 2 2 2 2 2 5 2 ...
+##  $ Vomit           : Factor w/ 2 levels &quot;0&quot;,&quot;1&quot;: 2 2 2 2 2 2 2 2 2 2 ...</code></pre>
+<p>At this step, you should have a dataframe containing 952 observations, and 21 variables: 1 outcome, 12 numeric/integer predictors, and 8 factor variables. All variables should have values that are ready for analysis. The outcome should be in the 1st slot.</p>
+</div>
+<div id="data-splitting" class="section level1">
+<h1>Data splitting</h1>
+<p>Let’s do data splitting again. Use <code>caret</code> functions (or any other way you like) to split the data into 70/30 train/test portions.</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" data-line-number="1"><span class="co">#write code that splits data into 70/30 train/test</span></a>
+<a class="sourceLine" id="cb60-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb60-3" data-line-number="3">trainset &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> d<span class="op">$</span>season, <span class="dt">p =</span> <span class="fl">0.7</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb60-4" data-line-number="4">data_train =<span class="st"> </span>d[trainset,] <span class="co">#extract observations/rows for training, assign to new variable</span></a>
+<a class="sourceLine" id="cb60-5" data-line-number="5">data_test =<span class="st"> </span>d[<span class="op">-</span>trainset,] <span class="co">#do the same for the test set</span></a>
+<a class="sourceLine" id="cb60-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb60-7" data-line-number="7"><span class="co"># Check it</span></a>
+<a class="sourceLine" id="cb60-8" data-line-number="8"><span class="kw">dim</span>(d)</a></code></pre></div>
+<pre><code>## [1] 952  21</code></pre>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1"><span class="kw">dim</span>(data_train)</a></code></pre></div>
+<pre><code>## [1] 668  21</code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1"><span class="kw">dim</span>(data_test)</a></code></pre></div>
+<pre><code>## [1] 284  21</code></pre>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" data-line-number="1"><span class="co">#call the 2 parts data_train and data_test</span></a></code></pre></div>
+</div>
+<div id="parallelization" class="section level1">
+<h1>Parallelization</h1>
+<p>Similar to <code>mlr</code>, <code>caret</code> allows you to use multiple processors at the same time. It is easy to set up, and the few lines below do the trick.</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" data-line-number="1">n_cores &lt;-<span class="st"> </span><span class="dv">4</span> <span class="co">#number of cores to use</span></a>
+<a class="sourceLine" id="cb67-2" data-line-number="2">cl &lt;-<span class="st"> </span><span class="kw">makePSOCKcluster</span>(n_cores)</a>
+<a class="sourceLine" id="cb67-3" data-line-number="3"><span class="kw">registerDoParallel</span>(cl) <span class="co">#comment out this line if you don&#39;t want parallel computing</span></a></code></pre></div>
+</div>
+<div id="model-fitting" class="section level1">
+<h1>Model fitting</h1>
+<p>We’ll now explore fitting and training several tree-based models. We’ll also explore how including/excluding missing values and centering/scaling or not might affect the results.</p>
+<div id="a-null-model" class="section level2">
+<h2>A null model</h2>
+<p>To define a null model, we need to determine what performance measure we want to track. Since we now have a categorical outcome with more than 2 categories, the regular 2x2 table/confusion matrix, and measurements that rely on it don’t quite work, though many of them have versions that go beyond the 2x2 table. To keep things simple, we will use accuracy, which is simply the fraction of correct predictions. It is easy to compute, no matter how many categories we have. The null model still predicts the most frequent category. We can use that as baseline performance.</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" data-line-number="1"><span class="co">#write code that computes accuracy for a null model that always predicts the most common category</span></a>
+<a class="sourceLine" id="cb68-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb68-3" data-line-number="3"><span class="kw">summary</span>(mod_null &lt;-<span class="st"> </span><span class="kw">multinom</span>(season <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> d)) <span class="co"># I think we&#39;re being asked to do a null model for the logistic regression?</span></a></code></pre></div>
+<pre><code>## # weights:  8 (3 variable)
+## initial  value 1319.752232 
+## final  value 1204.773441 
+## converged</code></pre>
+<pre><code>## Call:
+## multinom(formula = season ~ 1, data = d)
+## 
+## Coefficients:
+##        (Intercept)
+## Summer  -0.5744861
+## Fall    -0.3029044
+## Winter   0.6865581
+## 
+## Std. Errors:
+##        (Intercept)
+## Summer  0.11183106
+## Fall    0.10297199
+## Winter  0.08229232
+## 
+## Residual Deviance: 2409.547 
+## AIC: 2415.547</code></pre>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1">predict_null &lt;-<span class="st"> </span><span class="kw">predict</span>(mod_null)</a>
+<a class="sourceLine" id="cb71-2" data-line-number="2">outcome &lt;-<span class="st"> </span>d<span class="op">$</span>season</a>
+<a class="sourceLine" id="cb71-3" data-line-number="3">(accur &lt;-<span class="st"> </span><span class="kw">mean</span>(outcome <span class="op">==</span><span class="st"> </span>predict_null)) <span class="co"># accuracy is 0.46</span></a></code></pre></div>
+<pre><code>## [1] 0.4632353</code></pre>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1"><span class="kw">prop.table</span>(<span class="kw">table</span>(outcome)) <span class="co"># confirmed, that in the actual dataset 46% of the outcome is Winter, the most frequent outcome</span></a></code></pre></div>
+<pre><code>## outcome
+##    Spring    Summer      Fall    Winter 
+## 0.2331933 0.1313025 0.1722689 0.4632353</code></pre>
+<p>You should find that the null model has an accuracy of around 0.46.</p>
+</div>
+<div id="single-predictor-models" class="section level2">
+<h2>Single predictor models</h2>
+<p>Now let’s consider single predictor models, i.e., we’ll fit the outcome to each predictor one at a time to get an idea of the importance of individual predictors. Here, our model will be a tree. I’m actually not so sure if this makes a lot of sense since a “tree” with only one predictor seems a bit silly. But I guess we can try. It’s similar to a 1-predictor GLM.</p>
+<p>We’ll also do some parameter tuning here. Looking at the <a href="http://topepo.github.io/caret/available-models.html">caret documentation</a>, we find that the tuning parameter for the <code>rpart</code> model (which is the tree algorithm) is called <code>cp</code>. We could also find that using <code>modelLookup(&quot;rpart&quot;)</code>. We could either specify a grid of values to try for <code>cp</code> (we’ll use a grid below), or, for a single tuning parameter, <code>caret</code> allows one to set the number of values to try and picks those values automatically. We’ll do the latter approach here.</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1"><span class="co">#There is probably a nicer tidyverse way of doing this. I just couldn&#39;t think of it, so did it this way.</span></a>
+<a class="sourceLine" id="cb75-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb75-3" data-line-number="3">outcomename =<span class="st"> &quot;season&quot;</span></a>
+<a class="sourceLine" id="cb75-4" data-line-number="4">fitControl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;repeatedcv&quot;</span>,<span class="dt">number=</span><span class="dv">5</span>,<span class="dt">repeats=</span><span class="dv">5</span>) <span class="co">#setting CV method for caret</span></a>
+<a class="sourceLine" id="cb75-5" data-line-number="5">Npred &lt;-<span class="st"> </span><span class="kw">ncol</span>(data_train)<span class="op">-</span><span class="dv">1</span> <span class="co"># number of predictors</span></a>
+<a class="sourceLine" id="cb75-6" data-line-number="6">resultmat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Variable =</span> <span class="kw">names</span>(data_train)[<span class="op">-</span><span class="dv">1</span>], <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,Npred)) <span class="co">#store performance for each variable</span></a>
+<a class="sourceLine" id="cb75-7" data-line-number="7"><span class="cf">for</span> (n <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span><span class="kw">ncol</span>(data_train)) <span class="co">#loop over each predictor. For this to work, outcome must be in 1st column</span></a>
+<a class="sourceLine" id="cb75-8" data-line-number="8">{</a>
+<a class="sourceLine" id="cb75-9" data-line-number="9">  fit1 &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>( <span class="kw">as.formula</span>(<span class="kw">paste</span>(outcomename, <span class="st">&quot;~&quot;</span>,<span class="kw">names</span>(data_train)[n])) , <span class="dt">data =</span> data_train, <span class="dt">method =</span> <span class="st">&quot;rpart&quot;</span>, <span class="dt">trControl =</span> fitControl, <span class="dt">na.action =</span> na.pass, <span class="dt">tuneLength =</span> <span class="dv">10</span>) </a>
+<a class="sourceLine" id="cb75-10" data-line-number="10">resultmat[n<span class="dv">-1</span>,<span class="dv">2</span>]=<span class="st"> </span><span class="kw">max</span>(fit1<span class="op">$</span>results<span class="op">$</span>Accuracy)  </a>
+<a class="sourceLine" id="cb75-11" data-line-number="11">}</a>
+<a class="sourceLine" id="cb75-12" data-line-number="12"><span class="kw">print</span>(resultmat)</a></code></pre></div>
+<pre><code>##            Variable  Accuracy
+## 1           Action1 0.4625783
+## 2          CasesAll 0.4523858
+## 3           Country 0.4559635
+## 4            Deaths 0.4595846
+## 5          EndMonth 0.6283915
+## 6             gg2c4 0.4625740
+## 7        Hemisphere 0.4595819
+## 8  Hospitalizations 0.4574768
+## 9            MeanD1 0.4604835
+## 10           MeanI1 0.4578015
+## 11         MedianD1 0.4544713
+## 12         MedianI1 0.4529942
+## 13           OBYear 0.4616846
+## 14            Path1 0.4625800
+## 15          RateAll 0.4622732
+## 16          RiskAll 0.4739667
+## 17        Setting_1 0.4625823
+## 18       StartMonth 0.9011771
+## 19           Trans1 0.4559836
+## 20            Vomit 0.4625824</code></pre>
+<p>So it looks like most of the single predictor models don’t have accuracy much better than the null. 2 exceptions are <code>StartMonth</code> and <code>EndMonth</code>. Well, we would expect that the outbreak season and the month at which the outbreak started (and ended) have a strong correlation. I kept those variables here to see if that would happen and get some reassurance that our model works ok. Of course, in a real analysis, keeping those seems silly, we wouldn’t learn much from it (other than data entry appeared to have been done ok).</p>
+</div>
+</div>
+<div id="full-model" class="section level1">
+<h1>Full model</h1>
+<p>Anyway, now let’s fit a tree to the full model with all predictors.</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb77-2" data-line-number="2">fitControl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;repeatedcv&quot;</span>,<span class="dt">number=</span><span class="dv">5</span>,<span class="dt">repeats=</span><span class="dv">5</span>) </a>
+<a class="sourceLine" id="cb77-3" data-line-number="3">fit1 =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(season  <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;rpart&quot;</span>,  <span class="dt">trControl =</span> fitControl, <span class="dt">na.action =</span> na.pass, <span class="dt">tuneLength =</span> <span class="dv">10</span>) </a>
+<a class="sourceLine" id="cb77-4" data-line-number="4"><span class="kw">print</span>(fit1<span class="op">$</span>results)</a></code></pre></div>
+<pre><code>##            cp  Accuracy     Kappa AccuracySD    KappaSD
+## 1  0.00000000 0.9748780 0.9632995 0.01773415 0.02581931
+## 2  0.02181987 0.9745795 0.9627771 0.01864173 0.02742160
+## 3  0.04363974 0.9147405 0.8756817 0.02620009 0.03792063
+## 4  0.06545961 0.9012379 0.8558006 0.02304202 0.03322384
+## 5  0.08727948 0.9012379 0.8558006 0.02304202 0.03322384
+## 6  0.10909935 0.9012379 0.8558006 0.02304202 0.03322384
+## 7  0.13091922 0.9012379 0.8558006 0.02304202 0.03322384
+## 8  0.15273909 0.9012379 0.8558006 0.02304202 0.03322384
+## 9  0.17455896 0.9012379 0.8558006 0.02304202 0.03322384
+## 10 0.19637883 0.6993747 0.4826243 0.18511408 0.37438160</code></pre>
+<p>This printout shows us model performance for different values of the tuning parameter, cp. It seems for a high cp, we get a close to perfect model. Let’s take a look at this model. We could use the regular <code>plot</code> function, but the resulting tree looks ugly. The <code>prp</code> function from the <code>rpart.plot</code> package makes a much nicer tree (other packages to plot nice trees exist).</p>
+<div class="fyi">
+<p>I don’t quite understand the comment about a high cp yielding a near perfect model. To me it looks like th lowest cp’s (0 and 0.02) have the highest accuracy.</p>
+</div>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1"><span class="kw">prp</span>(fit1<span class="op">$</span>finalModel, <span class="dt">extra =</span> <span class="dv">1</span>, <span class="dt">type =</span> <span class="dv">1</span>)</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/printfigure-1.png" width="672" /></p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1">ww=<span class="fl">17.8</span><span class="op">/</span><span class="fl">2.54</span>; wh=ww; <span class="co">#for saving plot</span></a>
+<a class="sourceLine" id="cb80-2" data-line-number="2"><span class="kw">dev.print</span>(<span class="dt">device=</span>png,<span class="dt">width=</span>ww,<span class="dt">height=</span>wh,<span class="dt">units=</span><span class="st">&quot;in&quot;</span>,<span class="dt">res=</span><span class="dv">600</span>,<span class="dt">file=</span><span class="st">&quot;rparttree.png&quot;</span>) <span class="co">#save tree to file</span></a></code></pre></div>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+<p>So the model splits on month, repeatedly. And it also splits on the hemisphere, which makes sense since the seasons are switched in the Southern hemisphere. This is also likely the reason why the model with month only didn’t produce a perfect fit. It could get one hemisphere right, but not both. With both bits of information, we can get almost perfect predictions.</p>
+<p>Note two distinguishing features of this tree model: Even though we fed the algorithm the full model including all predictor variables, some - in fact, almost all - of them are not part of the final model. This is a good illustration of the feature/variable selection property that a tree does automatically. If it doesn’t find a certain predictor variable useful, it leaves it out.</p>
+<p>Also, note that some predictor variables are used more than once. In fact, in this example, only 2 variables are used, and they are used repeatedly.</p>
+<p>You can also see on each node the predictions for each outcome category at that step. It is always possible to build a tree that predicts perfectly, but that would lead to overfitting. That’s why we use cross-validation and tuning of the <code>cp</code> parameter, which reduces the risk of overfitting.</p>
+<p>Finally, note that by default, levels are ordered alphabetically (Fall/Spring/Summer/Winter). We could re-order the factor manually in the more logical Spring/Summer/Fall/Winter order. I would do that for a ‘real’ analysis where I want to show a nice final result, but here we can leave it as is, as long as we pay attention to this fact.</p>
+</div>
+<div id="re-fitting-the-tree" class="section level1">
+<h1>Re-fitting the tree</h1>
+<p>So the above produces an almost perfect fit, and thus more powerful models are not really needed. However, using start (and end) month information seems a bit like cheating. Of course, if we give the model that kind of information, it will do well. Let’s make it harder and remove those 2 variables from both the training and test sets.</p>
+<p>Also, further below, I had problems fitting some of the models, the NA caused problems. The issue often is that while the underlying algorithm can handle the missing values (as you saw above), when using wrappers like <code>caret</code>, things break down. I could either skip <code>caret</code> and try to access the different models directly. For now, I decided to go the other route and drop the data with the missing values. To be able to compare the different models below, I’m dropping those NA observations here. Since the data changed, we also need to re-do the null model computation to be able to compare properly.</p>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" data-line-number="1"><span class="co">#write code that removes StartMonth and EndMonth from both training and test sets</span></a>
+<a class="sourceLine" id="cb82-2" data-line-number="2">data_train<span class="op">$</span>StartMonth &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb82-3" data-line-number="3">data_train<span class="op">$</span>EndMonth &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb82-4" data-line-number="4">data_test<span class="op">$</span>StartMonth &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb82-5" data-line-number="5">data_test<span class="op">$</span>EndMonth &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb82-6" data-line-number="6"><span class="co"># then drop all observations with missing values in both trian and test sets</span></a>
+<a class="sourceLine" id="cb82-7" data-line-number="7">data_train &lt;-<span class="st"> </span>data_train[<span class="kw">complete.cases</span>(data_train), ]</a>
+<a class="sourceLine" id="cb82-8" data-line-number="8"><span class="kw">summary</span>(data_train) <span class="co"># no more NA&#39;s</span></a></code></pre></div>
+<pre><code>##     season           Action1       CasesAll        Country   
+##  Spring:130   Unspecified:426   Min.   :    1.0   Japan:209  
+##  Summer: 74   Yes        :130   1st Qu.:    9.0   Other:278  
+##  Fall  : 95                     Median :   25.0   USA  : 69  
+##  Winter:257                     Mean   :  152.5              
+##                                 3rd Qu.:   69.0              
+##                                 Max.   :32150.0              
+##      Deaths        gg2c4        Hemisphere  Hospitalizations 
+##  Min.   :0.00000   No :392   Northern:517   Min.   : 0.0000  
+##  1st Qu.:0.00000   Yes:164   Southern: 39   1st Qu.: 0.0000  
+##  Median :0.00000                            Median : 0.0000  
+##  Mean   :0.02878                            Mean   : 0.4658  
+##  3rd Qu.:0.00000                            3rd Qu.: 0.0000  
+##  Max.   :4.00000                            Max.   :54.0000  
+##      MeanD1           MeanI1          MedianD1         MedianI1     
+##  Min.   : 0.000   Min.   : 0.000   Min.   : 0.000   Min.   : 0.000  
+##  1st Qu.: 0.000   1st Qu.: 0.000   1st Qu.: 0.000   1st Qu.: 0.000  
+##  Median : 0.000   Median : 0.000   Median : 0.000   Median : 0.000  
+##  Mean   : 1.517   Mean   : 0.795   Mean   : 2.849   Mean   : 2.092  
+##  3rd Qu.: 0.000   3rd Qu.: 0.000   3rd Qu.: 0.000   3rd Qu.: 0.000  
+##  Max.   :96.000   Max.   :48.000   Max.   :72.000   Max.   :48.000  
+##      OBYear             Path1        RateAll          RiskAll       
+##  Min.   :1983   No         :124   Min.   :  0.00   Min.   :    0.0  
+##  1st Qu.:1999   Unspecified:402   1st Qu.:  0.00   1st Qu.:    0.0  
+##  Median :2002   Yes        : 30   Median : 13.92   Median :   19.0  
+##  Mean   :2002                     Mean   : 25.82   Mean   :  389.7  
+##  3rd Qu.:2005                     3rd Qu.: 48.04   3rd Qu.:  108.2  
+##  Max.   :2010                     Max.   :100.00   Max.   :24000.0  
+##       Setting_1                Trans1    Vomit  
+##  Other     :436   Environmental   : 55   0:265  
+##  Restaurant:120   Foodborne       :233   1:291  
+##                   Person to Person: 78          
+##                   Unknown         : 44          
+##                   Unspecified     :146          
+## </code></pre>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" data-line-number="1">data_test &lt;-<span class="st"> </span>data_test[<span class="kw">complete.cases</span>(data_test), ]</a>
+<a class="sourceLine" id="cb84-2" data-line-number="2"><span class="kw">summary</span>(data_test) <span class="co"># no more NA&#39;s</span></a></code></pre></div>
+<pre><code>##     season           Action1       CasesAll        Country   
+##  Spring: 57   Unspecified:199   Min.   :   1.00   Japan:107  
+##  Summer: 29   Yes        : 40   1st Qu.:   7.00   Other:104  
+##  Fall  : 40                     Median :  20.00   USA  : 28  
+##  Winter:113                     Mean   :  85.38              
+##                                 3rd Qu.:  53.00              
+##                                 Max.   :6390.00              
+##      Deaths       gg2c4        Hemisphere  Hospitalizations 
+##  Min.   :0.0000   No :168   Northern:225   Min.   : 0.0000  
+##  1st Qu.:0.0000   Yes: 71   Southern: 14   1st Qu.: 0.0000  
+##  Median :0.0000                            Median : 0.0000  
+##  Mean   :0.1172                            Mean   : 0.8787  
+##  3rd Qu.:0.0000                            3rd Qu.: 0.0000  
+##  Max.   :9.0000                            Max.   :99.0000  
+##      MeanD1           MeanI1           MedianD1         MedianI1     
+##  Min.   : 0.000   Min.   : 0.0000   Min.   : 0.000   Min.   : 0.000  
+##  1st Qu.: 0.000   1st Qu.: 0.0000   1st Qu.: 0.000   1st Qu.: 0.000  
+##  Median : 0.000   Median : 0.0000   Median : 0.000   Median : 0.000  
+##  Mean   : 1.134   Mean   : 0.6987   Mean   : 1.594   Mean   : 1.259  
+##  3rd Qu.: 0.000   3rd Qu.: 0.0000   3rd Qu.: 0.000   3rd Qu.: 0.000  
+##  Max.   :67.000   Max.   :36.0000   Max.   :60.000   Max.   :65.000  
+##      OBYear             Path1        RateAll          RiskAll      
+##  Min.   :1992   No         : 46   Min.   :  0.00   Min.   :   0.0  
+##  1st Qu.:1999   Unspecified:183   1st Qu.:  0.00   1st Qu.:   0.0  
+##  Median :2002   Yes        : 10   Median : 17.86   Median :  20.0  
+##  Mean   :2002                     Mean   : 30.56   Mean   : 175.5  
+##  3rd Qu.:2005                     3rd Qu.: 55.78   3rd Qu.:  97.5  
+##  Max.   :2010                     Max.   :105.00   Max.   :6851.0  
+##       Setting_1                Trans1   Vomit  
+##  Other     :187   Environmental   :17   0:125  
+##  Restaurant: 52   Foodborne       :90   1:114  
+##                   Person to Person:28          
+##                   Unknown         :17          
+##                   Unspecified     :87          
+## </code></pre>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb86-1" data-line-number="1"><span class="kw">nrow</span>(data_test)<span class="op">/</span>(<span class="kw">nrow</span>(data_test) <span class="op">+</span><span class="st"> </span><span class="kw">nrow</span>(data_train)) <span class="co"># Still 30%, good</span></a></code></pre></div>
+<pre><code>## [1] 0.3006289</code></pre>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb88-1" data-line-number="1"><span class="co"># copy and paste the code from above that computes performance of a null model</span></a>
+<a class="sourceLine" id="cb88-2" data-line-number="2">revised_d &lt;-<span class="st"> </span><span class="kw">rbind</span>(data_train, data_test)</a>
+<a class="sourceLine" id="cb88-3" data-line-number="3"><span class="kw">summary</span>(mod_null &lt;-<span class="st"> </span><span class="kw">multinom</span>(season <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> revised_d)) <span class="co"># I think we&#39;re being asked to do a null model for the logistic regression?</span></a></code></pre></div>
+<pre><code>## # weights:  8 (3 variable)
+## initial  value 1102.104017 
+## iter  10 value 1003.488080
+## final  value 1003.479377 
+## converged</code></pre>
+<pre><code>## Call:
+## multinom(formula = season ~ 1, data = revised_d)
+## 
+## Coefficients:
+##        (Intercept)
+## Summer  -0.5963798
+## Fall    -0.3258337
+## Winter   0.6823945
+## 
+## Std. Errors:
+##        (Intercept)
+## Summer  0.12270425
+## Fall    0.11293804
+## Winter  0.08972344
+## 
+## Residual Deviance: 2006.959 
+## AIC: 2012.959</code></pre>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" data-line-number="1">predict_null &lt;-<span class="st"> </span><span class="kw">predict</span>(mod_null)</a>
+<a class="sourceLine" id="cb91-2" data-line-number="2">outcome &lt;-<span class="st"> </span>revised_d<span class="op">$</span>season</a>
+<a class="sourceLine" id="cb91-3" data-line-number="3">(accur &lt;-<span class="st"> </span><span class="kw">mean</span>(outcome <span class="op">==</span><span class="st"> </span>predict_null)) <span class="co"># accuracy is 0.46</span></a></code></pre></div>
+<pre><code>## [1] 0.4654088</code></pre>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb93-1" data-line-number="1"><span class="kw">prop.table</span>(<span class="kw">table</span>(outcome)) </a></code></pre></div>
+<pre><code>## outcome
+##    Spring    Summer      Fall    Winter 
+## 0.2352201 0.1295597 0.1698113 0.4654088</code></pre>
+<p>You should find a very similar null-model accuracy, around 0.46.</p>
+<p>Now, let’s re-do the fit above fitting a single tree. I’ll increase the tuneLength value a bit so the algorithm can try a few more parameter values.</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb95-1" data-line-number="1"><span class="co">#copy and paste the code from above that fits the single tree. set tuneLength to 20. </span></a>
+<a class="sourceLine" id="cb95-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb95-3" data-line-number="3">fitControl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;repeatedcv&quot;</span>,<span class="dt">number=</span><span class="dv">5</span>,<span class="dt">repeats=</span><span class="dv">5</span>) </a>
+<a class="sourceLine" id="cb95-4" data-line-number="4">rpart_fit2 =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(season  <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;rpart&quot;</span>,  <span class="dt">trControl =</span> fitControl, <span class="dt">na.action =</span> na.pass, <span class="dt">tuneLength =</span> <span class="dv">20</span>) </a>
+<a class="sourceLine" id="cb95-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb95-6" data-line-number="6"><span class="co"># look at model performance for different cp values. Also plot the tree.</span></a>
+<a class="sourceLine" id="cb95-7" data-line-number="7"><span class="kw">print</span>(rpart_fit2<span class="op">$</span>results) <span class="co"># The final value used for the model was cp = 0.01742651.</span></a></code></pre></div>
+<pre><code>##              cp  Accuracy      Kappa AccuracySD    KappaSD
+## 1  0.0000000000 0.4406906 0.14929009 0.04014181 0.06117116
+## 2  0.0009681394 0.4406906 0.14929009 0.04014181 0.06117116
+## 3  0.0019362788 0.4403335 0.14862047 0.04054011 0.06205869
+## 4  0.0029044182 0.4417685 0.14791743 0.04090063 0.06122825
+## 5  0.0038725576 0.4428399 0.14760886 0.03990468 0.06076178
+## 6  0.0048406971 0.4449987 0.14621235 0.04019554 0.06076727
+## 7  0.0058088365 0.4450051 0.14288192 0.03766741 0.06007901
+## 8  0.0067769759 0.4514465 0.13967658 0.03689510 0.05911547
+## 9  0.0077451153 0.4518068 0.13766475 0.03720265 0.05983752
+## 10 0.0087132547 0.4517714 0.12175307 0.03535503 0.06031206
+## 11 0.0096813941 0.4488885 0.11132721 0.03377926 0.06130327
+## 12 0.0106495335 0.4489342 0.09190201 0.03110417 0.05750603
+## 13 0.0116176729 0.4496581 0.08526367 0.03235586 0.06083704
+## 14 0.0125858124 0.4507228 0.05218213 0.03051872 0.05052446
+## 15 0.0135539518 0.4503624 0.04880457 0.03001709 0.04381689
+## 16 0.0145220912 0.4532390 0.04328970 0.02651709 0.04337113
+## 17 0.0154902306 0.4546937 0.03554787 0.02312313 0.03739328
+## 18 0.0164583700 0.4561223 0.03059785 0.02161883 0.03584857
+## 19 0.0174265094 0.4608037 0.02509599 0.01878758 0.04038019
+## 20 0.0183946488 0.4597227 0.02116783 0.01800965 0.03765672</code></pre>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb97-1" data-line-number="1"><span class="co"># plot the tree</span></a>
+<a class="sourceLine" id="cb97-2" data-line-number="2"><span class="kw">prp</span>(rpart_fit2<span class="op">$</span>finalModel, <span class="dt">extra =</span> <span class="dv">1</span>, <span class="dt">type =</span> <span class="dv">1</span>)</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/fullfit-2-1.png" width="672" /></p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1">ww=<span class="fl">17.8</span><span class="op">/</span><span class="fl">2.54</span>; wh=ww; <span class="co">#for saving plot</span></a>
+<a class="sourceLine" id="cb98-2" data-line-number="2"><span class="kw">dev.print</span>(<span class="dt">device=</span>png,<span class="dt">width=</span>ww,<span class="dt">height=</span>wh,<span class="dt">units=</span><span class="st">&quot;in&quot;</span>,<span class="dt">res=</span><span class="dv">600</span>,<span class="dt">file=</span><span class="st">&quot;rparttree_fit2.png&quot;</span>) </a></code></pre></div>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+<p>With those variables removed, the tree model doesn’t perform very well. Accuracy is similar to the null model. You can see that in the tree figure, the final nodes (leaves) show a lot of mis-predictions. Note again that only a few variables are used to build the tree, and OBYear shows up more than once.</p>
+<div class="fyi">
+<p>Hmmm…. With the seed I set, my final tree doesn’t use OBYear at all. It only uses CasesAll and RiskAll. HOWEVER, when I run the model with a different seed I get OBYear as a predictor. So it seems that the model is so confused and poor that different runs will yield different sets of predictors, and the best accuracy will still be similar to the accuracy of the null model.</p>
+</div>
+<p>Let’s see if we can get improved performance with more complicated models. That is, of course, not guaranteed. If there is no “signal” in the data, it doesn’t matter how complicated the model is. We won’t get anything predictive.</p>
+</div>
+<div id="random-forest" class="section level1">
+<h1>Random forest</h1>
+<p>Let’s try a random forest. We’ll use the <code>ranger</code> algorithm for this (it’s generally faster than the <code>rf</code> algorithm). This model has parameters that can and should be tuned. To do the tuning, we set up a grid of parameters and search over that grid. More efficient ways exist, e.g., doing an optimization using something like a genetic algorithm. The <code>mlr</code> package allows you to do that, <code>caret</code> doesn’t have those features out of the box, you would need to write your own code for that.</p>
+<p>Note that running the code below (and several models that follow) might take a few seconds or minutes, depending on the speed of your computer.</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb100-2" data-line-number="2">tuning_grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">.mtry =</span> <span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">7</span>,<span class="dt">by=</span><span class="dv">1</span>), <span class="dt">.splitrule =</span> <span class="st">&quot;gini&quot;</span>, <span class="dt">.min.node.size =</span> <span class="kw">seq</span>(<span class="dv">2</span>,<span class="dv">8</span>,<span class="dt">by=</span><span class="dv">1</span>) )</a>
+<a class="sourceLine" id="cb100-3" data-line-number="3">ranger_fit2 =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(season <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;ranger&quot;</span>,  <span class="dt">trControl =</span> fitControl, <span class="dt">tuneGrid =</span> tuning_grid, <span class="dt">na.action =</span> na.pass) </a></code></pre></div>
+<p>We can’t plot a nice final tree anymore since the model is now a combination of trees. We can look at a plot of model performance as a function of the model tuning parameters.</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" data-line-number="1"><span class="kw">plot</span>(ranger_fit2)</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/randomforestresult-1.png" width="672" /></p>
+<p>This plot suggests that for around 4 randomly selected parameters and a minimum node size of 6, we get the best model. Note that there isn’t much difference in model performance for several different values of the tuning parameters, and the overall model isn’t that great either, an accuracy just shy of 0.5.</p>
+<div class="fyi">
+<p>In my model, the best accuracy was for 5 randomly selected parameters and a minimum mode size of 5. Best accuracy was just a bit over 0.51.</p>
+</div>
+</div>
+<div id="boosted-tree-ensemble" class="section level1">
+<h1>Boosted tree ensemble</h1>
+<p>Let’s now try a boosted regression tree ensemble. This method also has several parameters that need tuning, which are specified in <code>gbmGrid</code>.</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1">gbmGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">interaction.depth =</span> <span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">7</span>, <span class="dt">by =</span> <span class="dv">2</span>), <span class="dt">n.trees =</span> <span class="dv">300</span>, <span class="dt">shrinkage =</span> <span class="kw">c</span>(<span class="fl">0.1</span>, <span class="fl">0.01</span>), <span class="dt">n.minobsinnode =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>))</a>
+<a class="sourceLine" id="cb102-2" data-line-number="2">gbm_fit3 =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(season <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;gbm&quot;</span>, <span class="dt">trControl =</span> fitControl, <span class="dt">verbose=</span><span class="ot">FALSE</span>, <span class="dt">tuneGrid =</span> gbmGrid) </a></code></pre></div>
+<p>We can again look at diagnostic fits and variable importance plots for this model, as well as check performance.</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1"><span class="kw">plot</span>(gbm_fit3)</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/gbmresult-1.png" width="672" /></p>
+<p>It doesn’t look like the boosted tree model performs any better. It may be that no information in the predictors strongly correlates with the season.</p>
+<p>But let’s not give up yet, we’ll try a bit more. Let’s see if pre-processing helps.</p>
+</div>
+<div id="random-forest-with-pre-processed-predictors" class="section level1">
+<h1>Random forest with pre-processed predictors</h1>
+<p>Here, we’ll fit another random forest model but now use centering and scaling for the predictors.</p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1"><span class="co"># copy the random forest code from above. Add a statement to the train() function that centers and scales predictors.</span></a>
+<a class="sourceLine" id="cb104-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb104-3" data-line-number="3">tuning_grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">.mtry =</span> <span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">7</span>,<span class="dt">by=</span><span class="dv">1</span>), <span class="dt">.splitrule =</span> <span class="st">&quot;gini&quot;</span>, <span class="dt">.min.node.size =</span> <span class="kw">seq</span>(<span class="dv">2</span>,<span class="dv">8</span>,<span class="dt">by=</span><span class="dv">1</span>) )</a>
+<a class="sourceLine" id="cb104-4" data-line-number="4">fit4 =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(season <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;ranger&quot;</span>, <span class="dt">preProcess =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>), <span class="dt">trControl =</span> fitControl, <span class="dt">tuneGrid =</span> tuning_grid, <span class="dt">na.action =</span> na.pass) </a>
+<a class="sourceLine" id="cb104-5" data-line-number="5"><span class="co"># save the result as fit4. plot model results.</span></a>
+<a class="sourceLine" id="cb104-6" data-line-number="6"><span class="kw">plot</span>(fit4)</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/randomforest-2-1.png" width="672" /></p>
+<p>It doesn’t look like it helped a lot.</p>
+</div>
+<div id="discriminant-analysis" class="section level1">
+<h1>Discriminant analysis</h1>
+<p>Ok, let’s try one more. Since the trees don’t seem to work too well, and a logistic model doesn’t work for multiple categorical outcomes, let’s use another model that can do that, namely a discriminant analysis. We’ve already seen one of those previously. Let’s pick a different one. The caret package website lists a lot of algorithms. I don’t know how exactly they all differ. Let’s try the one called penalized discriminant analysis (pda) (penalized is another way of saying regularized, and we learned that regularization might sometimes help.)</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1"><span class="co">#write code that trains a pda model, use tuneLength 20. Save as fit5 and plot.</span></a>
+<a class="sourceLine" id="cb105-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) </a>
+<a class="sourceLine" id="cb105-3" data-line-number="3">(<span class="dt">fit5 =</span> caret<span class="op">::</span><span class="kw">train</span>(season  <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;pda&quot;</span>,  <span class="dt">trControl =</span> fitControl, <span class="dt">na.action =</span> na.pass, <span class="dt">tuneLength =</span> <span class="dv">20</span>))</a></code></pre></div>
+<pre><code>## Penalized Discriminant Analysis 
+## 
+## 556 samples
+##  18 predictor
+##   4 classes: &#39;Spring&#39;, &#39;Summer&#39;, &#39;Fall&#39;, &#39;Winter&#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 445, 446, 444, 445, 444, 444, ... 
+## Resampling results across tuning parameters:
+## 
+##   lambda        Accuracy   Kappa    
+##   0.0000000000  0.4510050  0.1356895
+##   0.0001000000  0.4510050  0.1356895
+##   0.0001467799  0.4510050  0.1356895
+##   0.0002154435  0.4510050  0.1356895
+##   0.0003162278  0.4510050  0.1356895
+##   0.0004641589  0.4510050  0.1356895
+##   0.0006812921  0.4510050  0.1356895
+##   0.0010000000  0.4510050  0.1356895
+##   0.0014677993  0.4510050  0.1356895
+##   0.0021544347  0.4510050  0.1356895
+##   0.0031622777  0.4510050  0.1356895
+##   0.0046415888  0.4510050  0.1356895
+##   0.0068129207  0.4510050  0.1356895
+##   0.0100000000  0.4506479  0.1350086
+##   0.0146779927  0.4506479  0.1348850
+##   0.0215443469  0.4506479  0.1348850
+##   0.0316227766  0.4506479  0.1348850
+##   0.0464158883  0.4502875  0.1341719
+##   0.0681292069  0.4506479  0.1345958
+##   0.1000000000  0.4506479  0.1344823
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was lambda = 0.</code></pre>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1"><span class="kw">plot</span>(fit5)</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/da-1.png" width="672" /></p>
+<p>Ok, that doesn’t look very good either. Alright, enough models, there just doesn’t seem to be much information in the data that could help predict season. So let’s start to wrap up.</p>
+</div>
+<div id="comparing-model-performance" class="section level1">
+<h1>Comparing model performance</h1>
+<p>To recap: After we removed the obvious predictors, we fitted 1 tree, 1 random forest, 1 gradient boosted tree, 1 random forest with processed predictors, and 1 discriminant analysis. Let’s compare the performance.</p>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" data-line-number="1">resamps &lt;-<span class="st"> </span><span class="kw">resamples</span>(<span class="kw">list</span>(<span class="dt">tree =</span> rpart_fit2,</a>
+<a class="sourceLine" id="cb108-2" data-line-number="2">                          <span class="dt">RF1 =</span> ranger_fit2,</a>
+<a class="sourceLine" id="cb108-3" data-line-number="3">                          <span class="dt">GBM =</span> gbm_fit3,</a>
+<a class="sourceLine" id="cb108-4" data-line-number="4">                          <span class="dt">RF2 =</span> fit4, </a>
+<a class="sourceLine" id="cb108-5" data-line-number="5">                          <span class="dt">PDA =</span> fit5))</a>
+<a class="sourceLine" id="cb108-6" data-line-number="6"><span class="kw">bwplot</span>(resamps)</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/randomforest-3-1.png" width="672" /></p>
+<p>This plot suggests that while none of the models are great, the random forest ones seem overall slightly better.</p>
+</div>
+<div id="evaluating-the-final-model" class="section level1">
+<h1>Evaluating the final model</h1>
+<p>Even though we didn’t really have any good model, and thus further evaluating it seems, in some sense pointless, for this exercise we’ll look at our “best” model anyway. We’ll declare the 1st random forest model (saved as <code>fit2</code>) to be the best.</p>
+<p>Model uncertainty in the predictions is shown in the previous plot.</p>
+<p>For categorical outcomes, we can’t plot residuals. But we can look at the final “2x2” (in this case, a 4x4) table (the confusion matrix) and compare true versus predicted outcomes and see if it shows any pattern.</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1"><span class="co">#Write code to get model predictions for the outcome on the training data.</span></a>
+<a class="sourceLine" id="cb109-2" data-line-number="2">data_train<span class="op">$</span>PredictRF &lt;-<span class="st"> </span><span class="kw">predict</span>(ranger_fit2)</a>
+<a class="sourceLine" id="cb109-3" data-line-number="3"><span class="co">#use predicted and actual outcomes, make a table and compute accuracy.</span></a>
+<a class="sourceLine" id="cb109-4" data-line-number="4">data_train =<span class="st"> </span><span class="kw">apply_labels</span>(data_train,</a>
+<a class="sourceLine" id="cb109-5" data-line-number="5">                      <span class="dt">PredictRF =</span> <span class="st">&quot;Predicted Season (random forest)&quot;</span>,</a>
+<a class="sourceLine" id="cb109-6" data-line-number="6">                      <span class="dt">season =</span> <span class="st">&quot;Actual Season&quot;</span>)</a>
+<a class="sourceLine" id="cb109-7" data-line-number="7">(acc_table &lt;-<span class="st"> </span><span class="kw">cro</span>(data_train<span class="op">$</span>PredictRF, data_train<span class="op">$</span>season))</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<thead>
+<tr>
+<th style="border-top: 2px solid grey;">
+</th>
+<th colspan="4" style="font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+ Actual Season 
+</th>
+</tr>
+<tr>
+<th style="font-weight: 900; border-bottom: 1px solid grey; text-align: center;">
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Spring 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Summer 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Fall 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Winter 
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="5" style="font-weight: 900;">
+ Predicted Season (random forest) 
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Spring 
+</td>
+<td style="text-align: right;">
+109
+</td>
+<td style="text-align: right;">
+1
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Summer 
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+64
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Fall 
+</td>
+<td style="text-align: right;">
+3
+</td>
+<td style="text-align: right;">
+4
+</td>
+<td style="text-align: right;">
+82
+</td>
+<td style="text-align: right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Winter 
+</td>
+<td style="text-align: right;">
+18
+</td>
+<td style="text-align: right;">
+5
+</td>
+<td style="text-align: right;">
+13
+</td>
+<td style="text-align: right;">
+256
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+   #Total cases 
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+130
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+74
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+95
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+257
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb110-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">diag</span>(<span class="kw">as.matrix</span>(acc_table[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">5</span>])), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)<span class="op">/</span><span class="kw">sum</span>(<span class="kw">as.matrix</span>(acc_table[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">5</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="co"># HEY, pretty good!!</span></a></code></pre></div>
+<pre><code>## [1] 0.9190647</code></pre>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="dt">data =</span> data_train<span class="op">$</span>PredictRF, <span class="dt">reference =</span> data_train<span class="op">$</span>season)</a></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction Spring Summer Fall Winter
+##     Spring    109      1    0      0
+##     Summer      0     64    0      0
+##     Fall        3      4   82      1
+##     Winter     18      5   13    256
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9191          
+##                  95% CI : (0.8932, 0.9404)
+##     No Information Rate : 0.4622          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.8788          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 2.544e-07       
+## 
+## Statistics by Class:
+## 
+##                      Class: Spring Class: Summer Class: Fall Class: Winter
+## Sensitivity                 0.8385        0.8649      0.8632        0.9961
+## Specificity                 0.9977        1.0000      0.9826        0.8796
+## Pos Pred Value              0.9909        1.0000      0.9111        0.8767
+## Neg Pred Value              0.9529        0.9797      0.9721        0.9962
+## Prevalence                  0.2338        0.1331      0.1709        0.4622
+## Detection Rate              0.1960        0.1151      0.1475        0.4604
+## Detection Prevalence        0.1978        0.1151      0.1619        0.5252
+## Balanced Accuracy           0.9181        0.9324      0.9229        0.9379</code></pre>
+<div class="note">
+<p>Accuracy is 0.92</p>
+</div>
+<p>You should see that the model gets a lot right (high numbers on the diagonal), but predicts winter more often than it should (last row). Accuracy in the training data is pretty good.</p>
+<p>But we know that performance on the training set is not that meaningful, especially with a complex model we always get fairly good performance on the data used to build the model. What matters is how it performs on new data, so let’s check that. We can look at the same for the test set, which is a better estimate of the true performance.</p>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1"><span class="co">#copy and paste the code from above, but now do it for the test set.</span></a>
+<a class="sourceLine" id="cb114-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">1111</span>) <span class="co">#makes each code block reproducible</span></a>
+<a class="sourceLine" id="cb114-3" data-line-number="3">tuning_grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">.mtry =</span> <span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">7</span>,<span class="dt">by=</span><span class="dv">1</span>), <span class="dt">.splitrule =</span> <span class="st">&quot;gini&quot;</span>, <span class="dt">.min.node.size =</span> <span class="kw">seq</span>(<span class="dv">2</span>,<span class="dv">8</span>,<span class="dt">by=</span><span class="dv">1</span>) )</a>
+<a class="sourceLine" id="cb114-4" data-line-number="4">ranger_test_fit2 =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(season <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_test, <span class="dt">method=</span><span class="st">&quot;ranger&quot;</span>,  <span class="dt">trControl =</span> fitControl, <span class="dt">tuneGrid =</span> tuning_grid, <span class="dt">na.action =</span> na.pass) </a>
+<a class="sourceLine" id="cb114-5" data-line-number="5"><span class="kw">plot</span>(ranger_test_fit2)</a></code></pre></div>
+<p><img src="Tree_Fitting_files/figure-html/predict-1.png" width="672" /></p>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" data-line-number="1"><span class="co"># get model predictions</span></a>
+<a class="sourceLine" id="cb115-2" data-line-number="2">data_test<span class="op">$</span>PredictRF &lt;-<span class="st"> </span><span class="kw">predict</span>(ranger_test_fit2)</a>
+<a class="sourceLine" id="cb115-3" data-line-number="3"><span class="co">#use predicted and actual outcomes, make a table and compute accuracy.</span></a>
+<a class="sourceLine" id="cb115-4" data-line-number="4">data_test =<span class="st"> </span><span class="kw">apply_labels</span>(data_test,</a>
+<a class="sourceLine" id="cb115-5" data-line-number="5">                      <span class="dt">PredictRF =</span> <span class="st">&quot;Predicted Season (random forest)&quot;</span>,</a>
+<a class="sourceLine" id="cb115-6" data-line-number="6">                      <span class="dt">season =</span> <span class="st">&quot;Actual Season&quot;</span>)</a>
+<a class="sourceLine" id="cb115-7" data-line-number="7">(acc_table_test &lt;-<span class="st"> </span><span class="kw">cro</span>(data_test<span class="op">$</span>PredictRF, data_test<span class="op">$</span>season))</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<thead>
+<tr>
+<th style="border-top: 2px solid grey;">
+</th>
+<th colspan="4" style="font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+ Actual Season 
+</th>
+</tr>
+<tr>
+<th style="font-weight: 900; border-bottom: 1px solid grey; text-align: center;">
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Spring 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Summer 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Fall 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Winter 
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="5" style="font-weight: 900;">
+ Predicted Season (random forest) 
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Spring 
+</td>
+<td style="text-align: right;">
+1
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Summer 
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Fall 
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Winter 
+</td>
+<td style="text-align: right;">
+56
+</td>
+<td style="text-align: right;">
+29
+</td>
+<td style="text-align: right;">
+40
+</td>
+<td style="text-align: right;">
+113
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+   #Total cases 
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+57
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+29
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+40
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+113
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">diag</span>(<span class="kw">as.matrix</span>(acc_table_test[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">5</span>])), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)<span class="op">/</span><span class="kw">sum</span>(<span class="kw">as.matrix</span>(acc_table_test[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">5</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="co"># Yikes, 0.48</span></a></code></pre></div>
+<pre><code>## [1] 0.4769874</code></pre>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="dt">data =</span> data_test<span class="op">$</span>PredictRF, <span class="dt">reference =</span> data_test<span class="op">$</span>season)</a></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction Spring Summer Fall Winter
+##     Spring      1      0    0      0
+##     Summer      0      0    0      0
+##     Fall        0      0    0      0
+##     Winter     56     29   40    113
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.477           
+##                  95% CI : (0.4122, 0.5423)
+##     No Information Rate : 0.4728          
+##     P-Value [Acc &gt; NIR] : 0.4737          
+##                                           
+##                   Kappa : 0.0098          
+##                                           
+##  Mcnemar&#39;s Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: Spring Class: Summer Class: Fall Class: Winter
+## Sensitivity               0.017544        0.0000      0.0000      1.000000
+## Specificity               1.000000        1.0000      1.0000      0.007937
+## Pos Pred Value            1.000000           NaN         NaN      0.474790
+## Neg Pred Value            0.764706        0.8787      0.8326      1.000000
+## Prevalence                0.238494        0.1213      0.1674      0.472803
+## Detection Rate            0.004184        0.0000      0.0000      0.472803
+## Detection Prevalence      0.004184        0.0000      0.0000      0.995816
+## Balanced Accuracy         0.508772        0.5000      0.5000      0.503968</code></pre>
+<p>```</p>
+<p>Here, the confusion matrix doesn’t look good at all. Off-diagonal entries are larger than diagonal, accuracy is about as good as a null model, and agrees with the cross-validated results. That last point is good, that means our cross-validation routine properly estimates the performance of “new” data. Of course, even this estimate on test data is a bit optimistic, since real new data is usually collected under slightly different circumstances and with different protocols, making it more likely that model performance is reduced.</p>
+</div>
+<div id="wrapping-up" class="section level1">
+<h1>Wrapping up</h1>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1"><span class="co"># shut down the parallel computing cluster we created at the beginning of the analysis</span></a>
+<a class="sourceLine" id="cb120-2" data-line-number="2"><span class="kw">stopCluster</span>(cl)</a></code></pre></div>
+<p>Overall, this suggests there is just no “signal” in the variables we are trying to use to predict the outcome, and the model fits to “noise” - thus doing ok on training data but failing on the test/cross-validated performance evaluation.</p>
+<p>We can conclude that this is an analysis where we walk away “empty handed”. If this were a real analysis and you had data and did a ‘let’s see if something is going on’ analysis, this would be somewhat disappointing. If you had a specific, plausible hypothesis before you started your analysis (e.g., that outbreak size is correlated with season), finding that your biologically reasonable hypothesis doesn’t seem to be right is useful. Unfortunately, null results are still hard to publish.</p>
+<p>Note that we didn’t use p-values here, but I bet we would have found several that are statistically significant <strong>when evaluated on the training data</strong> (as they usually are). But they would be meaningless and essentially “fitting the noise”. I contend that a lot of what’s published out there is exactly that, spurious p-values because models are evaluated on the training data.</p>
+</div>
+<div id="end-notes" class="section level1">
+<h1>End notes</h1>
+<p>Above, I kept search grids relatively small and specified other things (e.g., number of trees) to make sure things run reasonably fast. For a real project, I would make my searches and tuning more exhaustive, which might mean waiting a few hours for the code to run. If you want to, try to increase the search space or try different models to see if you can get a better performing model. It doesn’t seem to me that the data has any meaningful signal that would lead to a great model with much-improved performance. But you are welcome to see if you can find a model that performs better. If you do get a model that performs well (&gt;0.6 accuracy), let me know. I’d be curious to see it.</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

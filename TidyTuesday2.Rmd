@@ -1,0 +1,601 @@
+---
+title: "TidyTuesday2"
+author: Ellen Cheng
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Load Libraries
+```{r libraries}
+library(tidyverse)
+library(knitr)
+library(caret)
+library(ModelMetrics)
+library(forcats)
+library(doParallel)
+library(rpart)
+library(rpart.plot)
+library(mda)
+library(ranger)
+library(nnet)
+library(expss)
+```
+This week's Tidy Tuesday examines information about the R packages on CRAN.
+
+Get the data!
+
+## Get the Data
+```{r get_data}
+cran_code <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-11-12/loc_cran_packages.csv")
+```
+
+I'll run basic summaries of the data to see if these data lend to some interesting questions I can analyze statistically.
+
+### Format & examine the data
+```{r look_data}
+summary(cran_code)
+```
+
+&nbsp;
+
+**TABLE 1. Variables in the Tidy Tuesday dataset**
+
+| Variable | Class | Description |
+|:------------- |:-------------:|:-------------------------|
+|file|double|Number of files|
+|language|character|Programming Language|
+|blank|double|Blank Lines|
+|comment|double|Commented Lines|
+|code|double|Lines of Code|
+|pkg_name|character|Package Name|
+|version|character|Package Version|
+
+```{r levels_data}
+cran_code$language <- factor(cran_code$language)
+cran_code$pkg_name <- factor(cran_code$pkg_name)
+length(levels(cran_code$language)) # 108 languages
+length(levels(cran_code$pkg_name)) # > 14,000 packages
+```
+
+We see that many packages use languages in addition to R. But there are too many languages here to work with as a categorical response or predictor (N = 108)! Luckily, there are just a few languages that make up the bulk of the data records. Which are the most common? Here are the top 10 languages (count = # of data records):
+```{r top_lang}
+pkg_lang <- cran_code %>% 
+  group_by(language) %>%
+  summarize(count=n()) %>%
+  arrange(desc(count))
+knitr::kable(pkg_lang[1:10,])
+```
+
+Of the 108 languages, these 37 are represented only once or twice among all the R packages--even more reason to only use a subset of these data, if 'language' is going to be part of the analysis:
+```{r single_lang}
+sort(pkg_lang$language[pkg_lang$count < 3])
+```
+
+From looking at the data, here are two potential questions to evaluate:
+
+* Q1: Is there a relationship between the major version number and the number of languages a package uses?
+
+* Q2: What are the best predictors of computer language (only for top five non-R languages)?
+
+## Question 1: Relationship Between Major Version and Number of Languages Used
+As packages becomes more developed (i.e., major version number is higher), the number of computer languages used in the package may increase because additional languages may be required to perform some more complicated functions efficiently. 
+
+Null hypothesis: Number of languages is unrelated to major version number. 
+Alt. hypothesis: Number of languages INCREASES with major version number.
+
+To evaluate this idea, I will first format the data. I want to create a column with the major version number, but some versions are represented as dates such as "2007-02-05". Since I can't tell from such "versions" whether or not a package has gone through many iterations of development (i.e., how developed the package it), I'll exclude those data from analyses.
+
+### Format data
+```{r format_data}
+# for Q1
+dat <- cran_code %>%
+  dplyr::mutate(maj_version = as.numeric(gsub("\\..*$", "", version))) # forcing it to be numeric gets rid of some of the funny date versions
+dat <- subset(dat, maj_version < 22) # this gets rid of the rest of the funny date versions
+
+# Data for Q1
+dat1 <- dat %>% 
+  dplyr::select(language, pkg_name, maj_version) %>%
+  group_by(pkg_name, maj_version) %>%
+  summarize(num_lang = n()) %>%
+  ungroup() %>%
+  select(num_lang, maj_version)
+range(dat1$maj_version) # Highest version is 21
+range(dat1$num_lang) # Maximum number of languages is 17
+```
+
+At this point, the dataset for Q1 goes up to major version 21. The highest number of computer languages used in a single package is 17. Most packages use three or fewer languages and are in major version 0 or 1. I'll do some exploratory data analysis to see if further data cleaning is warranted.
+
+### Exploratory data analysis
+
+**TABLE 2. Sample sizes (# of data records) for each combination of major version (rows) and number of languages (columns).**
+```{r Q1_EDA}
+table(dat1$maj_version, dat1$num_lang)
+```
+
+The most frequent number of languages for an R package is 1. Most packages include three or fewer languages.
+
+**FIGURE 1. The number of R packages (y-axis) with the specified number of languages (x-axis).**
+```{r Q1_EDA2}
+ggplot(dat1, aes(x=num_lang)) + 
+  geom_bar(color = "black", fill = "white") +
+  labs(x = "Number of languages", y = "Count of packages") +
+  theme_bw(base_size = 12)
+```
+
+Most packages are in major version 0 or 1. Very few packages are in a major version > 5.
+
+**FIGURE 2. The number of R packages (y-axis) with the specified major version (x-axis).**
+```{r Q1_EDA3}
+ggplot(dat1, aes(x=maj_version)) + 
+  geom_bar(color = "black", fill = "white") +
+  labs(x = "Major version", y = "Count of packages") +
+  theme_bw(base_size = 12)
+```
+
+Regardless of major version, the number of languages in an R package tends to be low (3 or fewer languages). There are only five packages (out of > 14,000) with major versions > 10, and these have 4 or fewer languages. 
+
+**FIGURE 3. Scatterplot: Relationship between major version (x-axis) and number of languages (y-axis) for an R package.**
+
+The size of the point is scaled to the number of packages.
+```{r Q1_EDA4}
+ggplot(dat1, aes(x = maj_version, y = num_lang)) +
+  geom_count() +
+  labs(x = "Major version", y = "Number of languages") +
+  theme_bw(base_size = 12)
+```
+
+
+**FIGURE 5. Boxplots: Relationship between major version (x-axis) and number of languages (y-axis) for an R package.**
+
+This figure shows the same information as Figure 4, but summarized as boxplots.
+```{r Q1_EDA5}
+ggplot(dat1, aes(x = factor(maj_version), y = num_lang)) +
+  geom_boxplot() +
+  labs(x = "Major version", y = "Number of languages") +
+  theme_bw(base_size = 12)
+```
+       
+### Train a model 
+
+```{r Q1_split_data}
+# Split data into train and test sets
+set.seed(100) 
+trainset <- caret::createDataPartition(y = dat1$num_lang, p = 0.7, list = FALSE)
+data_train = dat1[trainset,]
+data_test = dat1[-trainset,] 
+
+# Check it
+dim(dat1)
+dim(data_train)
+dim(data_test)
+```      
+
+Using the training data, fit a Poisson regression null model to serve as a baseline for evaluating non-null models. I will use RMSE as a measure of model performance. In the null model, RMSE = 1.524.
+
+```{r Q1_null}
+resultmat <- data.frame(Method = c("null", "glm", "earth"), RMSE = rep(0,3))
+
+# RMSE for a null model, as a baseline
+summary(modcheck_null <- glm(num_lang ~ 1, family="poisson", data = data_train)) 
+# intercept is 0.853
+resultmat$RMSE[resultmat$Method == "null"] <- rmse(modcheck_null)
+sqrt(mean(residuals(modcheck_null, type = "response")^2)) # double-check, yes same result
+```
+
+With the single predictor added in a Poisson regression, RMSE is 1.524, which is the same as for the null model. With a regression spline, the RMSE is even higher than the null, at 2.13. That seems strange...
+```{r Q1_training}
+fitControl <- trainControl(method="repeatedcv",number=5,repeats=5) 
+
+(fit_glm <- train(num_lang ~ ., data = data_train, method = "glm", family = "poisson", trControl = fitControl))
+resultmat$RMSE[resultmat$Method == "glm"] <- fit_glm$results$RMSE
+
+# Using earth (regression splines)
+(fit_earth <- train(num_lang ~ ., data = data_train, method = "earth", glm=list(family = "poisson"), trControl = fitControl)) 
+resultmat$RMSE[resultmat$Method == "earth"] <- min(fit_earth$results$RMSE)
+```
+
+**TABLE 3. RMSE for a null model and two different analysis methods applied to the training data.**
+
+The response variable is the number of languages used in a package. Null = Poisson regression on null model; glm = Poisson regression with 'major version' as a predictor; earth = regression spline with 'major version' as a predictor. 
+```{r Q1_training_table}
+knitr::kable(resultmat)
+```
+
+```{r Q1_resid_plots}
+data_train$PredictGLM <- predict(fit_glm, data_train)
+ggplot(data_train, aes(y = PredictGLM, x = num_lang)) +
+  geom_count() +
+  labs(x = "Actual # of Languages", y = "Predicted # of Languages", title = "Predictions vs. Actual # of Languages") +
+  theme_bw()
+
+# Compute residuals and plot that against predicted values
+data_train$ResidGLM <- residuals(fit_glm)
+ggplot(data_train, aes(y = ResidGLM, x = PredictGLM)) +
+  geom_count() +
+  labs(x = "Predicted # of Languages", y = "Residuals", title = "Residuals vs. Predicted # of Languages") +
+  theme_bw()
+```
+
+It looks like the the four data points with the highest predicted # of languages (> 3) could possibly be driving the regression model? (although this is such a small number of data points, maybe not). These data points with highest predicted # of languages belong to the data records with the four highest major versions. I'll redo the analysis just on packages with major version < 9, because this includes the bulk of the data. Let's see if results change any.
+
+### Train a model on only the data with major version < 9
+
+```{r Q1_high_predict}
+data_train[data_train$PredictGLM > 3, ] # Major versions 16, 17, 19, 21
+
+dat1_sub <- dat1[dat1$maj_version < 9, ]
+
+# Split data into train and test sets
+trainset_sub <- caret::createDataPartition(y = dat1_sub$num_lang, p = 0.7, list = FALSE)
+data_train_sub = dat1_sub[trainset_sub,]
+data_test_sub = dat1_sub[-trainset_sub,] 
+```
+
+```{r Q1_null_sub}
+resultmat_sub <- data.frame(Method = c("null_sub", "glm_sub", "earth_sub"), RMSE = rep(0,3))
+
+# RMSE for a null model on the subset data, as a baseline
+summary(modcheck_null_sub <- glm(num_lang ~ 1, family="poisson", data = data_train_sub)) 
+# intercept is 0.853
+resultmat_sub$RMSE[resultmat_sub$Method == "null_sub"] <- rmse(modcheck_null_sub)
+```
+
+```{r Q1_training_sub}
+set.seed(555) 
+(fit_glm_sub <- train(num_lang ~ ., data = data_train_sub, method = "glm", family = "poisson", trControl = fitControl))
+resultmat_sub$RMSE[resultmat_sub$Method == "glm_sub"] <- fit_glm_sub$results$RMSE
+
+# Using earth (regression splines)
+(fit_earth_sub <- train(num_lang ~ ., data = data_train_sub, method = "earth", glm=list(family = "poisson"), trControl = fitControl)) 
+resultmat_sub$RMSE[resultmat_sub$Method == "earth_sub"] <- min(fit_earth_sub$results$RMSE)
+```
+
+The results don't look any different when I only use the data with major version < 9. That is, number of languages does not seem to be associated with major version . 
+
+**TABLE 4. RMSE for a null model and two different analysis methods applied to training data with major version < 9.**
+
+The response variable is the number of languages used in a package. Null = Poisson regression on null model; glm = Poisson regression with 'major version' as a predictor; earth = regression spline with 'major version' as a predictor.
+
+```{r Q1_training_table_sub}
+knitr::kable(resultmat_sub)
+```
+
+As we already knew, the glm model has lower RMSE than the regression spline model. 
+
+### Model uncertainty
+
+**FIGURE 6. Comparison of model uncertainty for glm and regression spline models, using three metrics.**
+```{r Q1_uncertainty}
+extr_uncertainty <- resamples(list(fit_glm_sub, fit_earth_sub), modelNames = list("fit_glm_sub", "fit_earth_sub"))
+extr_uncertainty$values$`fit_glm_sub~RMSE`
+extr_uncertainty$values$`fit_earth_sub~RMSE`
+bwplot(extr_uncertainty, layout = c(1, 3))
+```
+
+### Diagnostic plots
+
+I'll run diagnostic plots on a model--they are all similar in performance, so I'll just use the Poisson regression analysis of the subset data. The plot of predictons vs. actual number of languages shows that predictions mostly fall between 2.34 and 2.36 regardless of the actual number of languages (this may be difficult to see, but the size of the points is scaled to the number of data records). I think this pretty much shows that the model with predictor really isn't any good because regardless of the actual number of languages the predicted number is close to the overall mean of the actual data. The residual plots are also odd-looking, with the residuals mostly falling between -1 and +1 but with some large residuals for the higher predicted numbers of langugages. The range of predicted number of languages is very small though, not straying far from the mean.
+
+**FIGURE 7. Predicted vs. actual number of languages, using the Poisson regression model with training data**
+```{r Q1_resid_plots_sub1}
+data_train_sub$PredictGLM <- predict(fit_glm_sub, data_train_sub)
+ggplot(data_train_sub, aes(y = PredictGLM, x = num_lang)) +
+  geom_count() +
+  labs(x = "Actual # of Languages", y = "Predicted # of Languages", title = "Predictions vs. Actual # of Languages") +
+  theme_bw()
+```
+
+**FIGURE 8. Residuals versus predicted number of languages, using the Poisson regression model with training data**
+```{r Q1_resid_plots_sub2}
+# Compute residuals and plot that against predicted values
+data_train_sub$ResidGLM <- residuals(fit_glm_sub)
+ggplot(data_train_sub, aes(y = ResidGLM, x = PredictGLM)) +
+  geom_count() +
+  labs(x = "Predicted # of Languages", y = "Residuals", title = "Residuals vs. Predicted # of Languages") +
+  theme_bw()
+```
+
+### Apply the model to the test data
+
+None of the models were any better than the null, but for the sake of completeness I'll see how the model does when applied to the test data that were set aside. For this, I'll again use the Poisson regression analysis of the subset data. The RMSE for the model on the test data is 1.52, similar to the RMSE on the training data. The diagnostic plots look very similar to those for the training data.
+
+**FIGURE 9. Predicted vs. actual number of languages, using the Poisson regression model with TEST data**
+```{r Q1_test_plots_sub1}
+# Apply the subset model to the test data 
+data_test_sub$PredictGLM <- predict(fit_glm_sub, data_test_sub)
+rmse(data_test_sub$num_lang, data_test_sub$PredictGLM)
+
+ggplot(data_test_sub, aes(y = PredictGLM, x = num_lang)) +
+  geom_count() +
+  labs(x = "Actual # of Languages", y = "Predicted # of Languages", title = "Predictions vs. Actual # of Languages (on TEST data)") +
+  theme_bw()
+```
+
+**FIGURE 10. Residuals versus predicted number of languages, using the Poisson regression model with TEST  data**
+```{r Q1_test_plots_sub2}
+# Compute residuals and plot that against predicted values
+data_test_sub$ResidGLM <- data_test_sub$num_lang - data_test_sub$PredictGLM
+ggplot(data_test_sub, aes(y = ResidGLM, x = PredictGLM)) +
+  geom_count() +
+  labs(x = "Predicted # of Languages", y = "Residuals", title = "Residuals vs. Predicted # of Languages (on TEST data)") +
+  theme_bw()
+```
+
+### Q1 conclusions
+
+MY CONCLUSION FROM THIS ANALYSIS is that the number of langugages used in a package is unrelated to the major version. That is, as a package is further developed (higher major version), the number of languages used in the package neither increases nor decreases in a deterministic way. One of the reasons for this completely uninteresting result may be that the range of predictor values was fairly limited. That is, most R packages are in their 0th or 1st major version. Only a small percentage of packages are at major version 3 or higher. On the other hand, there may very well just be no relationship between number of languages and major version of a package.
+
+## Question 2: Predictors of computer language
+For the more common non-R languages used in R packages, it would be interesting to look for distinguishing characteristics. For example, is the code:comment ratio characteristically higher for some languages? Are certain languages more frequently associated with more developed (i.e., higher major version) packages? This will be a classification analysis for predicting the computer language used in package files.
+
+First, I'll format the data. To be consistent with the final Q1 analysis, I'm using data for packages with major versions < 9. I'm adding two predictors: 1) the proportion of code that is comments, and 2) the number of files. From looking at the file, it seems that the variable 'code' does NOT include 'comment' and 'blank' because some records have more 'comments' than 'code'. There are some records with very few lines of code (sometimes 0 code), so I'm actually going to omit those from analysis and focus on records with > 20 lines of code).
+
+Among the five languages in this analysis, CSS and Tex have sample sizes that are an order of magnitude smaller than C-type, Markdown, and HTML. It may not make sense to include CSS and Tex in this analysis, but I'll leave them in for now just to see.
+
+```{r Q2_format_data}
+# Data for Q2
+dat2 <- dat %>% 
+  dplyr::select(language, maj_version, comment, code, file) %>%
+  dplyr::filter(maj_version < 9 & code > 20) %>%
+  dplyr::mutate(
+    prop_comment = round((comment/(comment + code))*100), 2) %>%
+  dplyr::select(language, file, prop_comment, maj_version) %>%
+  dplyr::filter(language != "R")
+summary(dat2)
+
+# only use the top five non-R languages, so figure out which those are. I checked this before, but need to re-do it on this subset of data.
+(Q2_pkg_lang <- dat2 %>% 
+  group_by(language) %>%
+  summarize(count=n()) %>%
+  arrange(desc(count)) %>%
+  top_n(n = 10))
+
+# I think 'C', 'C++', and 'C/C++ Header' can probably be combined into one language called 'C-type'
+dat2$language <- as.character(dat2$language)
+dat2$language[dat2$language %in% c("C", "C++", "C/C++ Header")] <- "C-type"
+(Q2_pkg_lang <- dat2 %>% 
+  group_by(language) %>%
+  summarize(count=n()) %>%
+  arrange(desc(count)) %>%
+  top_n(n = 5))
+
+dat2 <- dat2[dat2$language %in% Q2_pkg_lang$language, ]
+dat2$language <- factor(dat2$language)
+summary(dat2)
+```
+
+### Exploratory data analysis
+
+Explore the data that will be used in analysis. Yikes! The number of files is really skewed and there are some packages with a ridiculously large number of files (> 1000) for C-type language. Based on differences in the x-axis scale by language, it seems like there might be a difference among languages in probability of having a large number of files. For example, for Markdown the number of files seems to stay pretty small (mostly < 18 files). If the number of files is large, it's likely to be CSS or C-type language.
+
+**FIGURE 11. For each language, bar plot of the number of files per package.**
+```{r Q2_EDA1}
+# Univariate summaries
+ggplot(dat2, aes(x=file)) + 
+  geom_bar(color = "black", fill = "white") +
+  labs(x = "Number of files", y = "Count") +
+  theme_bw(base_size = 12) +
+  facet_wrap(language ~ ., scales = "free_x")
+
+# Which are the data records with > 1000 files in a package?
+dat2[dat2$file > 1000,] # oh these are all C-type
+```
+
+The distribution of records among major version is similar for the three most frequent languages (C-type, Markdown, HTML). For CSS and TeX, the distribution is relatively more uniform among major versions--the sample sizes for these two languages is also very small.
+
+**FIGURE 12. For each language, bar plot of major version levels.**
+```{r Q2_EDA2}
+ggplot(dat2, aes(x=maj_version)) + 
+  geom_bar(color = "black", fill = "white") +
+  labs(x = "Major version", y = "Count") +
+  theme_bw(base_size = 12) +
+  facet_wrap(language ~ ., scales = "free_x")
+```
+
+The languages do seem to differ in their distribution of % comment. Specifically, HMTL and Markdown files seem to have lower % comment than other languages. C-type files have larger % comment than other languages do.
+
+**FIGURE 13. For each language, distribution of % comment (i.e., proportion of code that is comments).**
+```{r Q2_EDA3}
+ggplot(dat2, aes(x=prop_comment)) + 
+  geom_histogram(color = "black", fill = "white") +
+  labs(x = "% comment", y = "Count") +
+  theme_bw(base_size = 12) +
+  facet_grid(language ~ ., scales = "free")
+```
+
+### Train a model
+
+```{r Q2_split_data}
+set.seed(123)
+trainset <- caret::createDataPartition(y = dat2$language, p = 0.7, list = FALSE)
+data_train = dat2[trainset,] 
+data_test = dat2[-trainset,] 
+
+# Check it
+dim(dat2)
+dim(data_train)
+dim(data_test)
+```
+
+I'll use accuracy as the performance measure to track in this classification analysis. First, I'll check accuracy of a null model, to serve as a baseline for comparing models. The accuracy of the null model is 38%, which is the proportion of the actual data that is C-type language, the most frequent (non-R) language.
+
+```{r Q2_null}
+summary(mod_null <- multinom(language ~ 1, data = dat2))
+predict_null <- predict(mod_null) # the null model always predicts the highest frequency one, which is C-type
+outcome <- dat2$language
+(accur <- mean(outcome == predict_null)) # accuracy is 0.38
+prop.table(table(outcome)) # confirmed, that in the actual dataset 38% of the outcome is C-type, the most frequent outcome
+```
+
+#### Rpart method on training data
+
+```{r Q2_rpart}
+n_cores <- 4 
+cl <- makePSOCKcluster(n_cores)
+registerDoParallel(cl) 
+
+set.seed(1111) 
+fitControl <- trainControl(method="repeatedcv", number=5, repeats=5) 
+
+treetune_df <- data.frame(TuneLength =1:10, cp = rep(0,10), Accuracy = rep(0,10), AccuracySD = rep(0,10))
+
+for(t in treetune_df$TuneLength) {
+  rpart_fit = caret::train(language  ~ ., data=data_train, method="rpart",  trControl = fitControl, na.action = na.pass, tuneLength = t) 
+  
+  best_acc <- rpart_fit$results[rpart_fit$results$Accuracy == max(rpart_fit$results$Accuracy),]
+  treetune_df[treetune_df$TuneLength == t, ] <- c(t,  best_acc[c("cp", "Accuracy", "AccuracySD")])
+}
+```
+
+With the 'rpart' method and all predictors, we are able to get the accuracy up to 0.75. It seems like once we have at least a tune length of 4 in this analysis, we get close to the highest accuracy possible. With longer tune lengths, the accuracy can be slightly improved, but the trade-off is a more complicated tree for just a little better accuracy. [NOTE: I don't know if it makes sense to compare different tune lengths instead of just running the analysis once with a large tune length, such as 10. But when I did the latter I got a complicated classification tree that was barely more accurate than the tree with the maximum tune length set at 4. I did the analysis this way so I could choose simpler models when more complicated models (longer tune length) barely improved accuracy.]
+
+**TABLE 5. Rpart method on training data: Model accuracy for different tune lengths.**
+```{r Q2_rpart_tab}
+knitr::kable(treetune_df)
+```
+
+I chose a tune length of four as the optimal tune length for a simple but relatively accurate model. With a tune length of four, the most important split occurs between records that have >= 3% comments (most likely language = C-type) and those that have < 3% comments (all other languages). The next split is also based on % comments--those with >= 1% comments are most likely to be HTML. The final split depends on number of files for records with < 1% comments. Among those records, when the number of files is >= 3, the most likely language is HTML; otherwise, Markdown. This tree doesn't parse out CSS and TeX languages, but those are the least common languages in this dataset (dat2).
+
+**FIGURE 14. Classification tree for tune length of 4.**
+```{r Q2_rpartresult, message=FALSE}
+rpart_fit4 = caret::train(language  ~ ., data=data_train, method="rpart",  trControl = fitControl, na.action = na.pass, tuneLength = 4) 
+
+print(rpart_fit4$results)
+prp( rpart_fit4$finalModel, extra = 1, type = 1)
+ww=17.8/2.54; wh=ww; #for saving plot
+dev.print(device=png,width=ww,height=wh,units="in",res=600,file="rparttree.png") #save tree to file
+```
+
+#### Random forest method on training data
+```{r Q2_randomforest, echo=TRUE}
+# set.seed(1111)
+# tuning_grid <- expand.grid( .mtry = seq(1,3,by=1), .splitrule = "gini", .min.node.size = seq(2,8,by=1) )
+# ranger_fit <- caret::train(language ~ ., data=data_train, method="ranger",  trControl = fitControl, tuneGrid = tuning_grid, na.action = na.pass)
+# 
+# saveRDS(ranger_fit, "TidyTuesday2_ranger_fit.RDS") # I'm saving it because it takes a long time to run. So when re-running this script I will just load the .RDS.
+```
+
+With the random forest method, we get a combination of trees as the "product". We can plot model performance as a function of the model tuning parameters. This plot suggests that we get the best model with two predictors and a minimum node size of seven. The highest accuracy from repeated cross-validation is just over 0.75. These results are consistent with what we found with the 'rpart' method.
+
+**FIGURE 15. Random forest method on training data: Model performance as a function of tuning parameters.**
+```{r Q2_randomforestresult, echo=TRUE}
+ranger_fit <- readRDS("TidyTuesday2_ranger_fit.RDS")
+plot(ranger_fit)
+```
+
+#### Rpart with centered and scaled predictors
+
+As a final try, I'll repeat the 'rpart' analysis, but with scaled and centered predictors to see how that affects results.
+
+```{r Q2_rpartCS, echo=TRUE}
+set.seed(1111) 
+treetuneCS_df <- data.frame(TuneLength =1:10, cp = rep(0,10), Accuracy = rep(0,10), AccuracySD = rep(0,10))
+
+for(t in treetuneCS_df$TuneLength) {
+  rpart_fitCS = caret::train(language  ~ ., data=data_train, method="rpart", preProcess = c("center", "scale"), trControl = fitControl, na.action = na.pass, tuneLength = t) 
+  
+  best_accCS <- rpart_fitCS$results[rpart_fitCS$results$Accuracy == max(rpart_fitCS$results$Accuracy),]
+  treetuneCS_df[treetuneCS_df$TuneLength == t, ] <- c(t,  best_accCS[c("cp", "Accuracy", "AccuracySD")])
+  }
+```
+
+It doesn't seem like scaling and centering predictors changed results any. The most important predictors are still proportion comment and number of files. The actual threshold values for splits is different because we're working with centered and scaled data now.
+
+**TABLE 6. Rpart method on training data, but with scaled and centered predictors: Model accuracy for different tune lengths.**
+```{r Q2_rpart_tab2}
+knitr::kable(treetuneCS_df)
+```
+
+**FIGURE 16. Classification tree for tune length of 4, with scaled and centered predictors.**
+```{r Q2_rpartCSresult, message=FALSE}
+rpartCS_fit4 = caret::train(language  ~ ., data=data_train, method="rpart",  preProcess = c("center", "scale"), trControl = fitControl, na.action = na.pass, tuneLength = 4) # Again a tune length of 4 seems like a good compromise between interpretability and accuracy.
+
+print(rpartCS_fit4)
+prp(rpartCS_fit4$finalModel, extra = 1, type = 1)
+ww=17.8/2.54; wh=ww; #for saving plot
+dev.print(device=png,width=ww,height=wh,units="in",res=600,file="rpartCStree.png") #save tree to file
+```
+
+### Model uncertainty
+
+I'll use resampling to compare the performance of the three models I've tried: 1) rpart classification tree, 2) random forest, 3) rpart classification tree with scaled, centered predictors. Figure 17 suggests that the three models really do have about equal performance in terms of accuracy.
+
+**FIGURE 17. Comparison of model uncertainty for the classification tree and random forest models.**
+```{r Q2_randomforest-3, echo=TRUE}
+resamps <- resamples(list(tree = rpart_fit4,
+                          RF = ranger_fit,
+                          treeCS = rpartCS_fit4))
+bwplot(resamps)
+```
+
+### Diagnostic summaries
+
+I'll generate diagnostic summaries for the random forest model. Specifically, I'll look for any patterns of the confusion matrix of true versus predicted outcomes. We have 75% accuracy with this model. The most common predictive "mistake" seems to be predicting Markdown when it's actually HTML. Overall (balanced accuracy), the model does best with predicting C-type correctly, followed by Markdown. 
+
+**TABLE 7. Predicted versus actual languages for random forest model on training data.**
+```{r Q2_acc_matrix}
+data_train$PredictRF <- predict(ranger_fit, data_train)
+data_train = expss::apply_labels(data_train,
+                      PredictRF = "Predicted Language (random forest)",
+                      language = "Actual Language")
+(acc_table <- cro(data_train$PredictRF, data_train$language))
+sum(diag(as.matrix(acc_table[1:5, 2:6])), na.rm = TRUE)/sum(as.matrix(acc_table[1:5, 2:6]), na.rm = TRUE) # 0.75
+```
+
+**TABLE 8. Confusion matrix for random forest model on training data.**
+```{r Q2_conf_matrix}
+caret::confusionMatrix(data = data_train$PredictRF, reference = data_train$language)
+```
+
+### Apply the model to the test data
+
+Finally, I'll see how the random forest model does when applied to the test data that were set aside. This will give us a better idea of the model's true performance. 
+
+```{r Q2_test_data}
+data_test$PredictRF <- predict(ranger_fit, data_test)
+data_test = expss::apply_labels(data_test,
+                      PredictRF = "Predicted Number of Languages (random forest)",
+                      language = "Actual Number of Languages")
+(acc_table_test <- cro(data_test$PredictRF, data_test$language))
+sum(diag(as.matrix(acc_table_test[1:5, 2:6])), na.rm = TRUE)/sum(as.matrix(acc_table_test[1:5, 2:6]), na.rm = TRUE) # 0.75
+caret::confusionMatrix(data = data_test$PredictRF, reference = data_test$language)
+```
+
+The plot of model performance as a function of the model tuning parameters suggests that we get the best model with two predictors and a minimum node size of eight The highest accuracy from repeated cross-validation is just under 0.742. These results are not that different from what we saw for the random forest on the training data.
+
+**FIGURE 18. Random forest method on TEST data: Model performance as a function of tuning parameters.**
+```{r Q2_randomforestresult_test, echo=TRUE}
+ranger_test_fit <- readRDS("TidyTuesday2_ranger_test_fit.RDS")
+plot(ranger_test_fit)
+```
+
+Model performance on the test data is not bad. For C-type especially, the model does pretty well. None of the test data were actually CSS, but that was a very small class in the original data anyway. As with the training data, a common predictive "mistake" of this random forest model seems to be predicting Markdown when it's actually HTML. 
+
+**TABLE 9. Predicted versus actual languages for random forest model on TEST data.**
+```{r Q2_acc_matrix_test}
+data_testPredictRF <- predict(ranger_fit, ranger)
+data_train = expss::apply_labels(data_train,
+                      PredictRF = "Predicted Number of Languages (random forest)",
+                      language = "Actual Number of Languages")
+(acc_table <- cro(data_train$PredictRF, data_train$language))
+sum(diag(as.matrix(acc_table[1:5, 2:6])), na.rm = TRUE)/sum(as.matrix(acc_table[1:5, 2:6]), na.rm = TRUE) # 0.75
+```
+
+**TABLE 10. Confusion matrix for random forest model on TEST data.**
+```{r Q2_conf_matrix_test}
+caret::confusionMatrix(data = data_train$PredictRF, reference = data_train$language)
+```
+
+### Q2 conclusions
+
+MY CONCLUSION FROM THIS ANALYSIS is that a relatively small number of prediction splits can classify languages with not-too-bad accuracy (75% accuracy) compared to the null model (38% accuracy). The most important predictors are % comments (with splits at 1% and 3% comments) and, secondarily, the number of files (with a split at 3 files). The model is pretty good at correctly classifying C-type language and not too bad with Markdown. Its performance with classifying HTML is meh. The other two languages were pretty infrequent in the data, so it's not too surprising that the model isn't great at classifying them (CSS and TeX).
+
+```{r stop}
+stopCluster(cl)
+```
