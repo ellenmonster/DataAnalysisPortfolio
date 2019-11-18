@@ -557,6 +557,7 @@ caret::confusionMatrix(data = data_train$PredictRF, reference = data_train$langu
 
 Finally, I'll see how the random forest model does when applied to the test data that were set aside. This will give us a better idea of the model's true performance. 
 
+**TABLE 9. Predicted versus actual languages for random forest model on TEST data.**
 ```{r Q2_test_data}
 data_test$PredictRF <- predict(ranger_fit, data_test)
 data_test = expss::apply_labels(data_test,
@@ -564,33 +565,14 @@ data_test = expss::apply_labels(data_test,
                       language = "Actual Number of Languages")
 (acc_table_test <- cro(data_test$PredictRF, data_test$language))
 sum(diag(as.matrix(acc_table_test[1:5, 2:6])), na.rm = TRUE)/sum(as.matrix(acc_table_test[1:5, 2:6]), na.rm = TRUE) # 0.75
-caret::confusionMatrix(data = data_test$PredictRF, reference = data_test$language)
-```
-
-The plot of model performance as a function of the model tuning parameters suggests that we get the best model with two predictors and a minimum node size of eight The highest accuracy from repeated cross-validation is just under 0.742. These results are not that different from what we saw for the random forest on the training data.
-
-**FIGURE 18. Random forest method on TEST data: Model performance as a function of tuning parameters.**
-```{r Q2_randomforestresult_test, echo=TRUE}
-ranger_test_fit <- readRDS("TidyTuesday2_ranger_test_fit.RDS")
-plot(ranger_test_fit)
-```
-
-Model performance on the test data is not bad. For C-type especially, the model does pretty well. None of the test data were actually CSS, but that was a very small class in the original data anyway. As with the training data, a common predictive "mistake" of this random forest model seems to be predicting Markdown when it's actually HTML. 
-
-**TABLE 9. Predicted versus actual languages for random forest model on TEST data.**
-```{r Q2_acc_matrix_test}
-data_testPredictRF <- predict(ranger_fit, ranger)
-data_train = expss::apply_labels(data_train,
-                      PredictRF = "Predicted Number of Languages (random forest)",
-                      language = "Actual Number of Languages")
-(acc_table <- cro(data_train$PredictRF, data_train$language))
-sum(diag(as.matrix(acc_table[1:5, 2:6])), na.rm = TRUE)/sum(as.matrix(acc_table[1:5, 2:6]), na.rm = TRUE) # 0.75
 ```
 
 **TABLE 10. Confusion matrix for random forest model on TEST data.**
-```{r Q2_conf_matrix_test}
-caret::confusionMatrix(data = data_train$PredictRF, reference = data_train$language)
+```{r Q2_test_data_confmatrix}
+caret::confusionMatrix(data = data_test$PredictRF, reference = data_test$language)
 ```
+
+Model performance on the test data is not bad. For C-type especially, the model does pretty well. None of the test data were actually CSS, but that was a very small class in the original data anyway. As with the training data, a common predictive "mistake" of this random forest model seems to be predicting Markdown when it's actually HTML. 
 
 ### Q2 conclusions
 

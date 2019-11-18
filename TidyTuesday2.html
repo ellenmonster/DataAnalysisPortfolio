@@ -487,6 +487,12 @@ div.tocify {
     <li>
       <a href="./Variable_Selection.html">Variable Selection Analysis</a>
     </li>
+    <li>
+      <a href="./Tree_Fitting.html">Tree Fitting Analysis</a>
+    </li>
+    <li>
+      <a href="./TidyTuesday2.html">TidyTuesday2: R Packages</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -511,15 +517,26 @@ div.tocify {
 
 <h1 class="title toc-ignore">TidyTuesday2</h1>
 <h4 class="author">Ellen Cheng</h4>
-<h4 class="date">14 November, 2019</h4>
+<h4 class="date">17 November, 2019</h4>
 
 </div>
 
 
 <div id="load-libraries" class="section level2">
 <h2>Load Libraries</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a></code></pre></div>
-<p>This week’s Tidy Tuesday examines information about all of the R packages on CRAN.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(tidyverse)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(knitr)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">library</span>(caret)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">library</span>(ModelMetrics)</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="kw">library</span>(forcats)</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="kw">library</span>(doParallel)</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="kw">library</span>(rpart)</a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="kw">library</span>(rpart.plot)</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="kw">library</span>(mda)</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw">library</span>(ranger)</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw">library</span>(nnet)</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="kw">library</span>(expss)</a></code></pre></div>
+<p>This week’s Tidy Tuesday examines information about the R packages on CRAN.</p>
 <p>Get the data!</p>
 </div>
 <div id="get-the-data" class="section level2">
@@ -551,7 +568,7 @@ div.tocify {
 ##                    
 ## </code></pre>
 <p> </p>
-<p>TABLE 1. Variables in the Tidy Tuesday Dataset</p>
+<p><strong>TABLE 1. Variables in the Tidy Tuesday dataset</strong></p>
 <table>
 <thead>
 <tr class="header">
@@ -600,63 +617,1297 @@ div.tocify {
 </table>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">cran_code<span class="op">$</span>language &lt;-<span class="st"> </span><span class="kw">factor</span>(cran_code<span class="op">$</span>language)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">cran_code<span class="op">$</span>pkg_name &lt;-<span class="st"> </span><span class="kw">factor</span>(cran_code<span class="op">$</span>pkg_name)</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw">levels</span>(cran_code<span class="op">$</span>language)</a></code></pre></div>
-<pre><code>##   [1] &quot;ActionScript&quot;               &quot;Ant&quot;                       
-##   [3] &quot;ANTLR Grammar&quot;              &quot;Apex Class&quot;                
-##   [5] &quot;AsciiDoc&quot;                   &quot;Assembly&quot;                  
-##   [7] &quot;AutoHotkey&quot;                 &quot;awk&quot;                       
-##   [9] &quot;Bourne Again Shell&quot;         &quot;Bourne Shell&quot;              
-##  [11] &quot;C&quot;                          &quot;C Shell&quot;                   
-##  [13] &quot;C/C++ Header&quot;               &quot;C#&quot;                        
-##  [15] &quot;C++&quot;                        &quot;CMake&quot;                     
-##  [17] &quot;CoffeeScript&quot;               &quot;CSS&quot;                       
-##  [19] &quot;CUDA&quot;                       &quot;diff&quot;                      
-##  [21] &quot;Dockerfile&quot;                 &quot;DOS Batch&quot;                 
-##  [23] &quot;DTD&quot;                        &quot;Expect&quot;                    
-##  [25] &quot;Fortran 77&quot;                 &quot;Fortran 90&quot;                
-##  [27] &quot;Fortran 95&quot;                 &quot;Gencat NLS&quot;                
-##  [29] &quot;Glade&quot;                      &quot;GLSL&quot;                      
-##  [31] &quot;GraphQL&quot;                    &quot;HCL&quot;                       
-##  [33] &quot;HTML&quot;                       &quot;INI&quot;                       
-##  [35] &quot;Java&quot;                       &quot;JavaScript&quot;                
-##  [37] &quot;JSON&quot;                       &quot;Julia&quot;                     
-##  [39] &quot;Jupyter Notebook&quot;           &quot;LESS&quot;                      
-##  [41] &quot;lex&quot;                        &quot;LFE&quot;                       
-##  [43] &quot;liquid&quot;                     &quot;Lisp&quot;                      
-##  [45] &quot;Lua&quot;                        &quot;m4&quot;                        
-##  [47] &quot;make&quot;                       &quot;Markdown&quot;                  
-##  [49] &quot;Mathematica&quot;                &quot;MATLAB&quot;                    
-##  [51] &quot;Maven&quot;                      &quot;MSBuild script&quot;            
-##  [53] &quot;MUMPS&quot;                      &quot;Mustache&quot;                  
-##  [55] &quot;NAnt script&quot;                &quot;Objective C++&quot;             
-##  [57] &quot;OpenCL&quot;                     &quot;Oracle PL/SQL&quot;             
-##  [59] &quot;Oracle Reports&quot;             &quot;Pascal&quot;                    
-##  [61] &quot;Perl&quot;                       &quot;PHP&quot;                       
-##  [63] &quot;PO File&quot;                    &quot;PowerShell&quot;                
-##  [65] &quot;ProGuard&quot;                   &quot;Prolog&quot;                    
-##  [67] &quot;Protocol Buffers&quot;           &quot;Python&quot;                    
-##  [69] &quot;Qt&quot;                         &quot;R&quot;                         
-##  [71] &quot;ReasonML&quot;                   &quot;reStructuredText&quot;          
-##  [73] &quot;RobotFramework&quot;             &quot;Ruby&quot;                      
-##  [75] &quot;Ruby HTML&quot;                  &quot;Rust&quot;                      
-##  [77] &quot;SAS&quot;                        &quot;Sass&quot;                      
-##  [79] &quot;Scala&quot;                      &quot;Scheme&quot;                    
-##  [81] &quot;sed&quot;                        &quot;Smalltalk&quot;                 
-##  [83] &quot;Solidity&quot;                   &quot;SparForte&quot;                 
-##  [85] &quot;SQL&quot;                        &quot;Standard ML&quot;               
-##  [87] &quot;Starlark&quot;                   &quot;Stata&quot;                     
-##  [89] &quot;SVG&quot;                        &quot;SWIG&quot;                      
-##  [91] &quot;Tcl/Tk&quot;                     &quot;TeX&quot;                       
-##  [93] &quot;TOML&quot;                       &quot;Unity-Prefab&quot;              
-##  [95] &quot;Velocity Template Language&quot; &quot;vim script&quot;                
-##  [97] &quot;Visual Basic&quot;               &quot;WebAssembly&quot;               
-##  [99] &quot;Windows Module Definition&quot;  &quot;Windows Resource File&quot;     
-## [101] &quot;xBase&quot;                      &quot;xBase Header&quot;              
-## [103] &quot;XML&quot;                        &quot;XQuery&quot;                    
-## [105] &quot;XSD&quot;                        &quot;XSLT&quot;                      
-## [107] &quot;yacc&quot;                       &quot;YAML&quot;</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">length</span>(<span class="kw">levels</span>(cran_code<span class="op">$</span>pkg_name))</a></code></pre></div>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw">length</span>(<span class="kw">levels</span>(cran_code<span class="op">$</span>language)) <span class="co"># 108 languages</span></a></code></pre></div>
+<pre><code>## [1] 108</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">length</span>(<span class="kw">levels</span>(cran_code<span class="op">$</span>pkg_name)) <span class="co"># &gt; 14,000 packages</span></a></code></pre></div>
 <pre><code>## [1] 14699</code></pre>
+<p>We see that many packages use languages in addition to R. But there are too many languages here to work with as a categorical response or predictor (N = 108)! Luckily, there are just a few languages that make up the bulk of the data records. Which are the most common? Here are the top 10 languages (count = # of data records):</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">pkg_lang &lt;-<span class="st"> </span>cran_code <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(language) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">count=</span><span class="kw">n</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(count))</a>
+<a class="sourceLine" id="cb9-5" data-line-number="5">knitr<span class="op">::</span><span class="kw">kable</span>(pkg_lang[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,])</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">language</th>
+<th align="right">count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">R</td>
+<td align="right">14689</td>
+</tr>
+<tr class="even">
+<td align="left">Markdown</td>
+<td align="right">5710</td>
+</tr>
+<tr class="odd">
+<td align="left">HTML</td>
+<td align="right">3680</td>
+</tr>
+<tr class="even">
+<td align="left">C</td>
+<td align="right">2162</td>
+</tr>
+<tr class="odd">
+<td align="left">C++</td>
+<td align="right">2041</td>
+</tr>
+<tr class="even">
+<td align="left">C/C++ Header</td>
+<td align="right">1867</td>
+</tr>
+<tr class="odd">
+<td align="left">Bourne Shell</td>
+<td align="right">500</td>
+</tr>
+<tr class="even">
+<td align="left">CSS</td>
+<td align="right">459</td>
+</tr>
+<tr class="odd">
+<td align="left">TeX</td>
+<td align="right">401</td>
+</tr>
+<tr class="even">
+<td align="left">JavaScript</td>
+<td align="right">370</td>
+</tr>
+</tbody>
+</table>
+<p>Of the 108 languages, these 37 are represented only once or twice among all the R packages–even more reason to only use a subset of these data, if ‘language’ is going to be part of the analysis:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">sort</span>(pkg_lang<span class="op">$</span>language[pkg_lang<span class="op">$</span>count <span class="op">&lt;</span><span class="st"> </span><span class="dv">3</span>])</a></code></pre></div>
+<pre><code>##  [1] ActionScript               AsciiDoc                  
+##  [3] AutoHotkey                 C#                        
+##  [5] CoffeeScript               Expect                    
+##  [7] Gencat NLS                 GLSL                      
+##  [9] GraphQL                    HCL                       
+## [11] LFE                        liquid                    
+## [13] Mathematica                MSBuild script            
+## [15] Mustache                   NAnt script               
+## [17] Objective C++              Oracle PL/SQL             
+## [19] Oracle Reports             PowerShell                
+## [21] ProGuard                   Prolog                    
+## [23] ReasonML                   Scheme                    
+## [25] sed                        Smalltalk                 
+## [27] Solidity                   SparForte                 
+## [29] Standard ML                Starlark                  
+## [31] SWIG                       Velocity Template Language
+## [33] vim script                 WebAssembly               
+## [35] xBase                      xBase Header              
+## [37] XQuery                    
+## 108 Levels: ActionScript Ant ANTLR Grammar Apex Class AsciiDoc ... YAML</code></pre>
+<p>From looking at the data, here are two potential questions to evaluate:</p>
+<ul>
+<li><p>Q1: Is there a relationship between the major version number and the number of languages a package uses?</p></li>
+<li><p>Q2: What are the best predictors of computer language (only for top five non-R languages)?</p></li>
+</ul>
+</div>
+</div>
+<div id="question-1-relationship-between-major-version-and-number-of-languages-used" class="section level2">
+<h2>Question 1: Relationship Between Major Version and Number of Languages Used</h2>
+<p>As packages becomes more developed (i.e., major version number is higher), the number of computer languages used in the package may increase because additional languages may be required to perform some more complicated functions efficiently.</p>
+<p>Null hypothesis: Number of languages is unrelated to major version number. Alt. hypothesis: Number of languages INCREASES with major version number.</p>
+<p>To evaluate this idea, I will first format the data. I want to create a column with the major version number, but some versions are represented as dates such as “2007-02-05”. Since I can’t tell from such “versions” whether or not a package has gone through many iterations of development (i.e., how developed the package it), I’ll exclude those data from analyses.</p>
+<div id="format-data" class="section level3">
+<h3>Format data</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># for Q1</span></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">dat &lt;-<span class="st"> </span>cran_code <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(<span class="dt">maj_version =</span> <span class="kw">as.numeric</span>(<span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">..*$&quot;</span>, <span class="st">&quot;&quot;</span>, version))) <span class="co"># forcing it to be numeric gets rid of some of the funny date versions</span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, maj_version <span class="op">&lt;</span><span class="st"> </span><span class="dv">22</span>) <span class="co"># this gets rid of the rest of the funny date versions</span></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co"># Data for Q1</span></a>
+<a class="sourceLine" id="cb12-7" data-line-number="7">dat1 &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(language, pkg_name, maj_version) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="st">  </span><span class="kw">group_by</span>(pkg_name, maj_version) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-10" data-line-number="10"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">num_lang =</span> <span class="kw">n</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-11" data-line-number="11"><span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-12" data-line-number="12"><span class="st">  </span><span class="kw">select</span>(num_lang, maj_version)</a>
+<a class="sourceLine" id="cb12-13" data-line-number="13"><span class="kw">range</span>(dat1<span class="op">$</span>maj_version) <span class="co"># Highest version is 21</span></a></code></pre></div>
+<pre><code>## [1]  0 21</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">range</span>(dat1<span class="op">$</span>num_lang) <span class="co"># Maximum number of languages is 17</span></a></code></pre></div>
+<pre><code>## [1]  1 17</code></pre>
+<p>At this point, the dataset for Q1 goes up to major version 21. The highest number of computer languages used in a single package is 17. Most packages use three or fewer languages and are in major version 0 or 1. I’ll do some exploratory data analysis to see if further data cleaning is warranted.</p>
+</div>
+<div id="exploratory-data-analysis" class="section level3">
+<h3>Exploratory data analysis</h3>
+<p><strong>TABLE 2. Sample sizes (# of data records) for each combination of major version (rows) and number of languages (columns).</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">table</span>(dat1<span class="op">$</span>maj_version, dat1<span class="op">$</span>num_lang)</a></code></pre></div>
+<pre><code>##     
+##         1    2    3    4    5    6    7    8    9   10   11   12   13   14
+##   0  2021 1891 1618  644  331  172   74   37   19    9    2    4    0    1
+##   1  2809 1361 1076  480  205  114   42   14   10    7    0    2    2    0
+##   2   440  242  215   96   51   37   18   13    3    1    0    0    1    0
+##   3   142   54   61   42   16    4    5    1    0    1    0    0    0    1
+##   4    34   14   28   13    9    4    4    1    2    0    1    0    0    1
+##   5    13    6    9    4    8    2    0    0    0    1    0    0    1    0
+##   6     5    1    4    3    0    2    0    0    0    0    0    0    0    0
+##   7     4    3    6    4    0    1    0    0    0    0    0    0    0    0
+##   8     1    1    1    0    2    0    0    0    0    0    0    0    0    0
+##   9     0    0    1    0    1    0    0    0    0    0    0    0    0    0
+##   10    0    0    2    0    0    0    0    0    0    0    0    0    0    0
+##   12    1    0    0    0    0    0    0    0    0    0    0    0    0    0
+##   16    1    0    0    0    0    0    0    0    0    0    0    0    0    0
+##   17    0    0    0    1    0    0    0    0    0    0    0    0    0    0
+##   19    1    0    0    0    0    0    0    0    0    0    0    0    0    0
+##   21    0    1    0    0    0    0    0    0    0    0    0    0    0    0
+##     
+##        15   16   17
+##   0     0    1    0
+##   1     1    0    1
+##   2     0    0    0
+##   3     0    0    0
+##   4     0    0    0
+##   5     0    0    0
+##   6     0    0    0
+##   7     1    0    0
+##   8     0    0    0
+##   9     0    0    0
+##   10    0    0    0
+##   12    0    0    0
+##   16    0    0    0
+##   17    0    0    0
+##   19    0    0    0
+##   21    0    0    0</code></pre>
+<p>The most frequent number of languages for an R package is 1. Most packages include three or fewer languages.</p>
+<p><strong>FIGURE 1. The number of R packages (y-axis) with the specified number of languages (x-axis).</strong></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(<span class="dt">x=</span>num_lang)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Number of languages&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Count of packages&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="st">  </span><span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_EDA2-1.png" width="672" /></p>
+<p>Most packages are in major version 0 or 1. Very few packages are in a major version &gt; 5.</p>
+<p><strong>FIGURE 2. The number of R packages (y-axis) with the specified major version (x-axis).</strong></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(<span class="dt">x=</span>maj_version)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb19-3" data-line-number="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Major version&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Count of packages&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="st">  </span><span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_EDA3-1.png" width="672" /></p>
+<p>Regardless of major version, the number of languages in an R package tends to be low (3 or fewer languages). There are only five packages (out of &gt; 14,000) with major versions &gt; 10, and these have 4 or fewer languages.</p>
+<p><strong>FIGURE 3. Scatterplot: Relationship between major version (x-axis) and number of languages (y-axis) for an R package.</strong></p>
+<p>The size of the point is scaled to the number of packages.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(<span class="dt">x =</span> maj_version, <span class="dt">y =</span> num_lang)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_count</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Major version&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Number of languages&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="st">  </span><span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_EDA4-1.png" width="672" /></p>
+<p><strong>FIGURE 5. Boxplots: Relationship between major version (x-axis) and number of languages (y-axis) for an R package.</strong></p>
+<p>This figure shows the same information as Figure 4, but summarized as boxplots.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">factor</span>(maj_version), <span class="dt">y =</span> num_lang)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb21-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb21-3" data-line-number="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Major version&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Number of languages&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="st">  </span><span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_EDA5-1.png" width="672" /></p>
+</div>
+<div id="train-a-model" class="section level3">
+<h3>Train a model</h3>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="co"># Split data into train and test sets</span></a>
+<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">100</span>) </a>
+<a class="sourceLine" id="cb22-3" data-line-number="3">trainset &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> dat1<span class="op">$</span>num_lang, <span class="dt">p =</span> <span class="fl">0.7</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb22-4" data-line-number="4">data_train =<span class="st"> </span>dat1[trainset,]</a>
+<a class="sourceLine" id="cb22-5" data-line-number="5">data_test =<span class="st"> </span>dat1[<span class="op">-</span>trainset,] </a>
+<a class="sourceLine" id="cb22-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb22-7" data-line-number="7"><span class="co"># Check it</span></a>
+<a class="sourceLine" id="cb22-8" data-line-number="8"><span class="kw">dim</span>(dat1)</a></code></pre></div>
+<pre><code>## [1] 14595     2</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">dim</span>(data_train)</a></code></pre></div>
+<pre><code>## [1] 10218     2</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw">dim</span>(data_test)</a></code></pre></div>
+<pre><code>## [1] 4377    2</code></pre>
+<p>Using the training data, fit a Poisson regression null model to serve as a baseline for evaluating non-null models. I will use RMSE as a measure of model performance. In the null model, RMSE = 1.524.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">resultmat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Method =</span> <span class="kw">c</span>(<span class="st">&quot;null&quot;</span>, <span class="st">&quot;glm&quot;</span>, <span class="st">&quot;earth&quot;</span>), <span class="dt">RMSE =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb28-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="co"># RMSE for a null model, as a baseline</span></a>
+<a class="sourceLine" id="cb28-4" data-line-number="4"><span class="kw">summary</span>(modcheck_null &lt;-<span class="st"> </span><span class="kw">glm</span>(num_lang <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">family=</span><span class="st">&quot;poisson&quot;</span>, <span class="dt">data =</span> data_train)) </a></code></pre></div>
+<pre><code>## 
+## Call:
+## glm(formula = num_lang ~ 1, family = &quot;poisson&quot;, data = data_train)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.9912  -0.9912  -0.2296   0.4116   6.1704  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) 0.851191   0.006464   131.7   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 8779.4  on 10217  degrees of freedom
+## Residual deviance: 8779.4  on 10217  degrees of freedom
+## AIC: 35392
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="co"># intercept is 0.853</span></a>
+<a class="sourceLine" id="cb30-2" data-line-number="2">resultmat<span class="op">$</span>RMSE[resultmat<span class="op">$</span>Method <span class="op">==</span><span class="st"> &quot;null&quot;</span>] &lt;-<span class="st"> </span><span class="kw">rmse</span>(modcheck_null)</a>
+<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="kw">sqrt</span>(<span class="kw">mean</span>(<span class="kw">residuals</span>(modcheck_null, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>)<span class="op">^</span><span class="dv">2</span>)) <span class="co"># double-check, yes same result</span></a></code></pre></div>
+<pre><code>## [1] 1.523959</code></pre>
+<p>With the single predictor added in a Poisson regression, RMSE is 1.524, which is the same as for the null model. With a regression spline, the RMSE is even higher than the null, at 2.13. That seems strange…</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1">fitControl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;repeatedcv&quot;</span>,<span class="dt">number=</span><span class="dv">5</span>,<span class="dt">repeats=</span><span class="dv">5</span>) </a>
+<a class="sourceLine" id="cb32-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb32-3" data-line-number="3">(fit_glm &lt;-<span class="st"> </span><span class="kw">train</span>(num_lang <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train, <span class="dt">method =</span> <span class="st">&quot;glm&quot;</span>, <span class="dt">family =</span> <span class="st">&quot;poisson&quot;</span>, <span class="dt">trControl =</span> fitControl))</a></code></pre></div>
+<pre><code>## Generalized Linear Model 
+## 
+## 10218 samples
+##     1 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 8174, 8174, 8175, 8175, 8174, 8175, ... 
+## Resampling results:
+## 
+##   RMSE      Rsquared      MAE     
+##   1.523612  0.0008765399  1.178648</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">resultmat<span class="op">$</span>RMSE[resultmat<span class="op">$</span>Method <span class="op">==</span><span class="st"> &quot;glm&quot;</span>] &lt;-<span class="st"> </span>fit_glm<span class="op">$</span>results<span class="op">$</span>RMSE</a>
+<a class="sourceLine" id="cb34-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb34-3" data-line-number="3"><span class="co"># Using earth (regression splines)</span></a>
+<a class="sourceLine" id="cb34-4" data-line-number="4">(fit_earth &lt;-<span class="st"> </span><span class="kw">train</span>(num_lang <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train, <span class="dt">method =</span> <span class="st">&quot;earth&quot;</span>, <span class="dt">glm=</span><span class="kw">list</span>(<span class="dt">family =</span> <span class="st">&quot;poisson&quot;</span>), <span class="dt">trControl =</span> fitControl)) </a></code></pre></div>
+<pre><code>## Multivariate Adaptive Regression Spline 
+## 
+## 10218 samples
+##     1 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 8174, 8174, 8174, 8175, 8175, 8174, ... 
+## Resampling results across tuning parameters:
+## 
+##   nprune  RMSE      Rsquared    MAE     
+##   2       2.130251  0.00882987  1.492984
+##   3       2.128964  0.01491017  1.494753
+##   4       2.129168  0.01456662  1.494874
+## 
+## Tuning parameter &#39;degree&#39; was held constant at a value of 1
+## RMSE was used to select the optimal model using the smallest value.
+## The final values used for the model were nprune = 3 and degree = 1.</code></pre>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1">resultmat<span class="op">$</span>RMSE[resultmat<span class="op">$</span>Method <span class="op">==</span><span class="st"> &quot;earth&quot;</span>] &lt;-<span class="st"> </span><span class="kw">min</span>(fit_earth<span class="op">$</span>results<span class="op">$</span>RMSE)</a></code></pre></div>
+<p><strong>TABLE 3. RMSE for a null model and two different analysis methods applied to the training data.</strong></p>
+<p>The response variable is the number of languages used in a package. Null = Poisson regression on null model; glm = Poisson regression with ‘major version’ as a predictor; earth = regression spline with ‘major version’ as a predictor.</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1">knitr<span class="op">::</span><span class="kw">kable</span>(resultmat)</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="right">RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">null</td>
+<td align="right">1.523959</td>
+</tr>
+<tr class="even">
+<td align="left">glm</td>
+<td align="right">1.523612</td>
+</tr>
+<tr class="odd">
+<td align="left">earth</td>
+<td align="right">2.128964</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1">data_train<span class="op">$</span>PredictGLM &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_glm, data_train)</a>
+<a class="sourceLine" id="cb38-2" data-line-number="2"><span class="kw">ggplot</span>(data_train, <span class="kw">aes</span>(<span class="dt">y =</span> PredictGLM, <span class="dt">x =</span> num_lang)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_count</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Actual # of Languages&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Predicted # of Languages&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Predictions vs. Actual # of Languages&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb38-5" data-line-number="5"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_resid_plots-1.png" width="672" /></p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="co"># Compute residuals and plot that against predicted values</span></a>
+<a class="sourceLine" id="cb39-2" data-line-number="2">data_train<span class="op">$</span>ResidGLM &lt;-<span class="st"> </span><span class="kw">residuals</span>(fit_glm)</a>
+<a class="sourceLine" id="cb39-3" data-line-number="3"><span class="kw">ggplot</span>(data_train, <span class="kw">aes</span>(<span class="dt">y =</span> ResidGLM, <span class="dt">x =</span> PredictGLM)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb39-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_count</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb39-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Predicted # of Languages&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Residuals vs. Predicted # of Languages&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb39-6" data-line-number="6"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_resid_plots-2.png" width="672" /></p>
+<p>It looks like the the four data points with the highest predicted # of languages (&gt; 3) could possibly be driving the regression model? (although this is such a small number of data points, maybe not). These data points with highest predicted # of languages belong to the data records with the four highest major versions. I’ll redo the analysis just on packages with major version &lt; 9, because this includes the bulk of the data. Let’s see if results change any.</p>
+</div>
+<div id="train-a-model-on-only-the-data-with-major-version-9" class="section level3">
+<h3>Train a model on only the data with major version &lt; 9</h3>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1">data_train[data_train<span class="op">$</span>PredictGLM <span class="op">&gt;</span><span class="st"> </span><span class="dv">3</span>, ] <span class="co"># Major versions 16, 17, 19, 21</span></a></code></pre></div>
+<pre><code>## # A tibble: 0 x 4
+## # … with 4 variables: num_lang &lt;int&gt;, maj_version &lt;dbl&gt;, PredictGLM &lt;dbl&gt;,
+## #   ResidGLM &lt;dbl&gt;</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1">dat1_sub &lt;-<span class="st"> </span>dat1[dat1<span class="op">$</span>maj_version <span class="op">&lt;</span><span class="st"> </span><span class="dv">9</span>, ]</a>
+<a class="sourceLine" id="cb42-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb42-3" data-line-number="3"><span class="co"># Split data into train and test sets</span></a>
+<a class="sourceLine" id="cb42-4" data-line-number="4">trainset_sub &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> dat1_sub<span class="op">$</span>num_lang, <span class="dt">p =</span> <span class="fl">0.7</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb42-5" data-line-number="5">data_train_sub =<span class="st"> </span>dat1_sub[trainset_sub,]</a>
+<a class="sourceLine" id="cb42-6" data-line-number="6">data_test_sub =<span class="st"> </span>dat1_sub[<span class="op">-</span>trainset_sub,] </a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1">resultmat_sub &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Method =</span> <span class="kw">c</span>(<span class="st">&quot;null_sub&quot;</span>, <span class="st">&quot;glm_sub&quot;</span>, <span class="st">&quot;earth_sub&quot;</span>), <span class="dt">RMSE =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb43-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb43-3" data-line-number="3"><span class="co"># RMSE for a null model on the subset data, as a baseline</span></a>
+<a class="sourceLine" id="cb43-4" data-line-number="4"><span class="kw">summary</span>(modcheck_null_sub &lt;-<span class="st"> </span><span class="kw">glm</span>(num_lang <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">family=</span><span class="st">&quot;poisson&quot;</span>, <span class="dt">data =</span> data_train_sub)) </a></code></pre></div>
+<pre><code>## 
+## Call:
+## glm(formula = num_lang ~ 1, family = &quot;poisson&quot;, data = data_train_sub)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.9953  -0.9953  -0.2341   0.4067   6.1631  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) 0.854240   0.006456   132.3   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 8798.4  on 10211  degrees of freedom
+## Residual deviance: 8798.4  on 10211  degrees of freedom
+## AIC: 35427
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1"><span class="co"># intercept is 0.853</span></a>
+<a class="sourceLine" id="cb45-2" data-line-number="2">resultmat_sub<span class="op">$</span>RMSE[resultmat_sub<span class="op">$</span>Method <span class="op">==</span><span class="st"> &quot;null_sub&quot;</span>] &lt;-<span class="st"> </span><span class="kw">rmse</span>(modcheck_null_sub)</a></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">555</span>) </a>
+<a class="sourceLine" id="cb46-2" data-line-number="2">(fit_glm_sub &lt;-<span class="st"> </span><span class="kw">train</span>(num_lang <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train_sub, <span class="dt">method =</span> <span class="st">&quot;glm&quot;</span>, <span class="dt">family =</span> <span class="st">&quot;poisson&quot;</span>, <span class="dt">trControl =</span> fitControl))</a></code></pre></div>
+<pre><code>## Generalized Linear Model 
+## 
+## 10212 samples
+##     1 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 8169, 8171, 8169, 8170, 8169, 8171, ... 
+## Resampling results:
+## 
+##   RMSE      Rsquared     MAE     
+##   1.530124  0.001401754  1.178145</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1">resultmat_sub<span class="op">$</span>RMSE[resultmat_sub<span class="op">$</span>Method <span class="op">==</span><span class="st"> &quot;glm_sub&quot;</span>] &lt;-<span class="st"> </span>fit_glm_sub<span class="op">$</span>results<span class="op">$</span>RMSE</a>
+<a class="sourceLine" id="cb48-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb48-3" data-line-number="3"><span class="co"># Using earth (regression splines)</span></a>
+<a class="sourceLine" id="cb48-4" data-line-number="4">(fit_earth_sub &lt;-<span class="st"> </span><span class="kw">train</span>(num_lang <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> data_train_sub, <span class="dt">method =</span> <span class="st">&quot;earth&quot;</span>, <span class="dt">glm=</span><span class="kw">list</span>(<span class="dt">family =</span> <span class="st">&quot;poisson&quot;</span>), <span class="dt">trControl =</span> fitControl)) </a></code></pre></div>
+<pre><code>## Multivariate Adaptive Regression Spline 
+## 
+## 10212 samples
+##     1 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 8169, 8169, 8170, 8170, 8170, 8169, ... 
+## Resampling results across tuning parameters:
+## 
+##   nprune  RMSE      Rsquared    MAE     
+##   2       2.137209  0.01217714  1.497885
+##   3       2.135610  0.01966892  1.500289
+##   4       2.135610  0.01966892  1.500289
+## 
+## Tuning parameter &#39;degree&#39; was held constant at a value of 1
+## RMSE was used to select the optimal model using the smallest value.
+## The final values used for the model were nprune = 3 and degree = 1.</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">resultmat_sub<span class="op">$</span>RMSE[resultmat_sub<span class="op">$</span>Method <span class="op">==</span><span class="st"> &quot;earth_sub&quot;</span>] &lt;-<span class="st"> </span><span class="kw">min</span>(fit_earth_sub<span class="op">$</span>results<span class="op">$</span>RMSE)</a></code></pre></div>
+<p>The results don’t look any different when I only use the data with major version &lt; 9. That is, number of languages does not seem to be associated with major version .</p>
+<p><strong>TABLE 4. RMSE for a null model and two different analysis methods applied to training data with major version &lt; 9.</strong></p>
+<p>The response variable is the number of languages used in a package. Null = Poisson regression on null model; glm = Poisson regression with ‘major version’ as a predictor; earth = regression spline with ‘major version’ as a predictor.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1">knitr<span class="op">::</span><span class="kw">kable</span>(resultmat_sub)</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="right">RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">null_sub</td>
+<td align="right">1.531110</td>
+</tr>
+<tr class="even">
+<td align="left">glm_sub</td>
+<td align="right">1.530124</td>
+</tr>
+<tr class="odd">
+<td align="left">earth_sub</td>
+<td align="right">2.135610</td>
+</tr>
+</tbody>
+</table>
+<p>As we already knew, the glm model has lower RMSE than the regression spline model.</p>
+</div>
+<div id="model-uncertainty" class="section level3">
+<h3>Model uncertainty</h3>
+<p><strong>FIGURE 6. Comparison of model uncertainty for glm and regression spline models, using three metrics.</strong></p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1">extr_uncertainty &lt;-<span class="st"> </span><span class="kw">resamples</span>(<span class="kw">list</span>(fit_glm_sub, fit_earth_sub), <span class="dt">modelNames =</span> <span class="kw">list</span>(<span class="st">&quot;fit_glm_sub&quot;</span>, <span class="st">&quot;fit_earth_sub&quot;</span>))</a>
+<a class="sourceLine" id="cb52-2" data-line-number="2">extr_uncertainty<span class="op">$</span>values<span class="op">$</span><span class="st">`</span><span class="dt">fit_glm_sub~RMSE</span><span class="st">`</span></a></code></pre></div>
+<pre><code>##  [1] 1.489485 1.585230 1.497949 1.579100 1.606965 1.579899 1.448188
+##  [8] 1.570475 1.523321 1.461191 1.601403 1.539507 1.542967 1.481498
+## [15] 1.507336 1.483156 1.572574 1.523208 1.514173 1.573925 1.495742
+## [22] 1.504472 1.517624 1.553944 1.499766</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1">extr_uncertainty<span class="op">$</span>values<span class="op">$</span><span class="st">`</span><span class="dt">fit_earth_sub~RMSE</span><span class="st">`</span></a></code></pre></div>
+<pre><code>##  [1] 2.109610 2.092437 2.105359 2.163551 2.110330 2.113653 2.096752
+##  [8] 2.153632 2.047056 2.188058 2.129789 2.138341 2.097807 2.075031
+## [15] 2.150646 2.185956 2.165986 2.123271 2.228987 2.099203 2.140423
+## [22] 2.184857 2.198352 2.160714 2.130460</code></pre>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1"><span class="kw">bwplot</span>(extr_uncertainty, <span class="dt">layout =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_uncertainty-1.png" width="672" /></p>
+</div>
+<div id="diagnostic-plots" class="section level3">
+<h3>Diagnostic plots</h3>
+<p>I’ll run diagnostic plots on a model–they are all similar in performance, so I’ll just use the Poisson regression analysis of the subset data. The plot of predictons vs. actual number of languages shows that predictions mostly fall between 2.34 and 2.36 regardless of the actual number of languages (this may be difficult to see, but the size of the points is scaled to the number of data records). I think this pretty much shows that the model with predictor really isn’t any good because regardless of the actual number of languages the predicted number is close to the overall mean of the actual data. The residual plots are also odd-looking, with the residuals mostly falling between -1 and +1 but with some large residuals for the higher predicted numbers of langugages. The range of predicted number of languages is very small though, not straying far from the mean.</p>
+<p><strong>FIGURE 7. Predicted vs. actual number of languages, using the Poisson regression model with training data</strong></p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1">data_train_sub<span class="op">$</span>PredictGLM &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_glm_sub, data_train_sub)</a>
+<a class="sourceLine" id="cb57-2" data-line-number="2"><span class="kw">ggplot</span>(data_train_sub, <span class="kw">aes</span>(<span class="dt">y =</span> PredictGLM, <span class="dt">x =</span> num_lang)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb57-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_count</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb57-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Actual # of Languages&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Predicted # of Languages&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Predictions vs. Actual # of Languages&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb57-5" data-line-number="5"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_resid_plots_sub1-1.png" width="672" /></p>
+<p><strong>FIGURE 8. Residuals versus predicted number of languages, using the Poisson regression model with training data</strong></p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1"><span class="co"># Compute residuals and plot that against predicted values</span></a>
+<a class="sourceLine" id="cb58-2" data-line-number="2">data_train_sub<span class="op">$</span>ResidGLM &lt;-<span class="st"> </span><span class="kw">residuals</span>(fit_glm_sub)</a>
+<a class="sourceLine" id="cb58-3" data-line-number="3"><span class="kw">ggplot</span>(data_train_sub, <span class="kw">aes</span>(<span class="dt">y =</span> ResidGLM, <span class="dt">x =</span> PredictGLM)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb58-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_count</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb58-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Predicted # of Languages&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Residuals vs. Predicted # of Languages&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb58-6" data-line-number="6"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_resid_plots_sub2-1.png" width="672" /></p>
+</div>
+<div id="apply-the-model-to-the-test-data" class="section level3">
+<h3>Apply the model to the test data</h3>
+<p>None of the models were any better than the null, but for the sake of completeness I’ll see how the model does when applied to the test data that were set aside. For this, I’ll again use the Poisson regression analysis of the subset data. The RMSE for the model on the test data is 1.52, similar to the RMSE on the training data. The diagnostic plots look very similar to those for the training data.</p>
+<p><strong>FIGURE 9. Predicted vs. actual number of languages, using the Poisson regression model with TEST data</strong></p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" data-line-number="1"><span class="co"># Apply the subset model to the test data </span></a>
+<a class="sourceLine" id="cb59-2" data-line-number="2">data_test_sub<span class="op">$</span>PredictGLM &lt;-<span class="st"> </span><span class="kw">predict</span>(fit_glm_sub, data_test_sub)</a>
+<a class="sourceLine" id="cb59-3" data-line-number="3"><span class="kw">rmse</span>(data_test_sub<span class="op">$</span>num_lang, data_test_sub<span class="op">$</span>PredictGLM)</a></code></pre></div>
+<pre><code>## [1] 1.532279</code></pre>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1"><span class="kw">ggplot</span>(data_test_sub, <span class="kw">aes</span>(<span class="dt">y =</span> PredictGLM, <span class="dt">x =</span> num_lang)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb61-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_count</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb61-3" data-line-number="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Actual # of Languages&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Predicted # of Languages&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Predictions vs. Actual # of Languages (on TEST data)&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb61-4" data-line-number="4"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_test_plots_sub1-1.png" width="672" /></p>
+<p><strong>FIGURE 10. Residuals versus predicted number of languages, using the Poisson regression model with TEST data</strong></p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1"><span class="co"># Compute residuals and plot that against predicted values</span></a>
+<a class="sourceLine" id="cb62-2" data-line-number="2">data_test_sub<span class="op">$</span>ResidGLM &lt;-<span class="st"> </span>data_test_sub<span class="op">$</span>num_lang <span class="op">-</span><span class="st"> </span>data_test_sub<span class="op">$</span>PredictGLM</a>
+<a class="sourceLine" id="cb62-3" data-line-number="3"><span class="kw">ggplot</span>(data_test_sub, <span class="kw">aes</span>(<span class="dt">y =</span> ResidGLM, <span class="dt">x =</span> PredictGLM)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb62-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_count</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb62-5" data-line-number="5"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Predicted # of Languages&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Residuals&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;Residuals vs. Predicted # of Languages (on TEST data)&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb62-6" data-line-number="6"><span class="st">  </span><span class="kw">theme_bw</span>()</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q1_test_plots_sub2-1.png" width="672" /></p>
+</div>
+<div id="q1-conclusions" class="section level3">
+<h3>Q1 conclusions</h3>
+<p>MY CONCLUSION FROM THIS ANALYSIS is that the number of langugages used in a package is unrelated to the major version. That is, as a package is further developed (higher major version), the number of languages used in the package neither increases nor decreases in a deterministic way. One of the reasons for this completely uninteresting result may be that the range of predictor values was fairly limited. That is, most R packages are in their 0th or 1st major version. Only a small percentage of packages are at major version 3 or higher. On the other hand, there may very well just be no relationship between number of languages and major version of a package.</p>
+</div>
+</div>
+<div id="question-2-predictors-of-computer-language" class="section level2">
+<h2>Question 2: Predictors of computer language</h2>
+<p>For the more common non-R languages used in R packages, it would be interesting to look for distinguishing characteristics. For example, is the code:comment ratio characteristically higher for some languages? Are certain languages more frequently associated with more developed (i.e., higher major version) packages? This will be a classification analysis for predicting the computer language used in package files.</p>
+<p>First, I’ll format the data. To be consistent with the final Q1 analysis, I’m using data for packages with major versions &lt; 9. I’m adding two predictors: 1) the proportion of code that is comments, and 2) the number of files. From looking at the file, it seems that the variable ‘code’ does NOT include ‘comment’ and ‘blank’ because some records have more ‘comments’ than ‘code’. There are some records with very few lines of code (sometimes 0 code), so I’m actually going to omit those from analysis and focus on records with &gt; 20 lines of code).</p>
+<p>Among the five languages in this analysis, CSS and Tex have sample sizes that are an order of magnitude smaller than C-type, Markdown, and HTML. It may not make sense to include CSS and Tex in this analysis, but I’ll leave them in for now just to see.</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1"><span class="co"># Data for Q2</span></a>
+<a class="sourceLine" id="cb63-2" data-line-number="2">dat2 &lt;-<span class="st"> </span>dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb63-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(language, maj_version, comment, code, file) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb63-4" data-line-number="4"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(maj_version <span class="op">&lt;</span><span class="st"> </span><span class="dv">9</span> <span class="op">&amp;</span><span class="st"> </span>code <span class="op">&gt;</span><span class="st"> </span><span class="dv">20</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb63-5" data-line-number="5"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(</a>
+<a class="sourceLine" id="cb63-6" data-line-number="6">    <span class="dt">prop_comment =</span> <span class="kw">round</span>((comment<span class="op">/</span>(comment <span class="op">+</span><span class="st"> </span>code))<span class="op">*</span><span class="dv">100</span>), <span class="dv">2</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb63-7" data-line-number="7"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(language, file, prop_comment, maj_version) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb63-8" data-line-number="8"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">filter</span>(language <span class="op">!=</span><span class="st"> &quot;R&quot;</span>)</a>
+<a class="sourceLine" id="cb63-9" data-line-number="9"><span class="kw">summary</span>(dat2)</a></code></pre></div>
+<pre><code>##          language         file          prop_comment    maj_version    
+##  Markdown    :4187   Min.   :    1.0   Min.   : 0.00   Min.   :0.0000  
+##  HTML        :3607   1st Qu.:    1.0   1st Qu.: 0.00   1st Qu.:0.0000  
+##  C++         :1988   Median :    2.0   Median : 1.00   Median :0.0000  
+##  C           :1738   Mean   :    6.9   Mean   : 8.63   Mean   :0.6907  
+##  C/C++ Header:1514   3rd Qu.:    3.0   3rd Qu.:13.00   3rd Qu.:1.0000  
+##  CSS         : 375   Max.   :10737.0   Max.   :98.00   Max.   :8.0000  
+##  (Other)     :2923</code></pre>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" data-line-number="1"><span class="co"># only use the top five non-R languages, so figure out which those are. I checked this before, but need to re-do it on this subset of data.</span></a>
+<a class="sourceLine" id="cb65-2" data-line-number="2">(Q2_pkg_lang &lt;-<span class="st"> </span>dat2 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb65-3" data-line-number="3"><span class="st">  </span><span class="kw">group_by</span>(language) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb65-4" data-line-number="4"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">count=</span><span class="kw">n</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb65-5" data-line-number="5"><span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(count)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb65-6" data-line-number="6"><span class="st">  </span><span class="kw">top_n</span>(<span class="dt">n =</span> <span class="dv">10</span>))</a></code></pre></div>
+<pre><code>## # A tibble: 10 x 2
+##    language     count
+##    &lt;fct&gt;        &lt;int&gt;
+##  1 Markdown      4187
+##  2 HTML          3607
+##  3 C++           1988
+##  4 C             1738
+##  5 C/C++ Header  1514
+##  6 CSS            375
+##  7 TeX            344
+##  8 Bourne Shell   324
+##  9 JavaScript     310
+## 10 Fortran 77     289</code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" data-line-number="1"><span class="co"># I think &#39;C&#39;, &#39;C++&#39;, and &#39;C/C++ Header&#39; can probably be combined into one language called &#39;C-type&#39;</span></a>
+<a class="sourceLine" id="cb67-2" data-line-number="2">dat2<span class="op">$</span>language &lt;-<span class="st"> </span><span class="kw">as.character</span>(dat2<span class="op">$</span>language)</a>
+<a class="sourceLine" id="cb67-3" data-line-number="3">dat2<span class="op">$</span>language[dat2<span class="op">$</span>language <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;C++&quot;</span>, <span class="st">&quot;C/C++ Header&quot;</span>)] &lt;-<span class="st"> &quot;C-type&quot;</span></a>
+<a class="sourceLine" id="cb67-4" data-line-number="4">(Q2_pkg_lang &lt;-<span class="st"> </span>dat2 <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb67-5" data-line-number="5"><span class="st">  </span><span class="kw">group_by</span>(language) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb67-6" data-line-number="6"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">count=</span><span class="kw">n</span>()) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb67-7" data-line-number="7"><span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(count)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb67-8" data-line-number="8"><span class="st">  </span><span class="kw">top_n</span>(<span class="dt">n =</span> <span class="dv">5</span>))</a></code></pre></div>
+<pre><code>## # A tibble: 5 x 2
+##   language count
+##   &lt;chr&gt;    &lt;int&gt;
+## 1 C-type    5240
+## 2 Markdown  4187
+## 3 HTML      3607
+## 4 CSS        375
+## 5 TeX        344</code></pre>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" data-line-number="1">dat2 &lt;-<span class="st"> </span>dat2[dat2<span class="op">$</span>language <span class="op">%in%</span><span class="st"> </span>Q2_pkg_lang<span class="op">$</span>language, ]</a>
+<a class="sourceLine" id="cb69-2" data-line-number="2">dat2<span class="op">$</span>language &lt;-<span class="st"> </span><span class="kw">factor</span>(dat2<span class="op">$</span>language)</a>
+<a class="sourceLine" id="cb69-3" data-line-number="3"><span class="kw">summary</span>(dat2)</a></code></pre></div>
+<pre><code>##      language         file            prop_comment     maj_version    
+##  C-type  :5240   Min.   :    1.000   Min.   : 0.000   Min.   :0.0000  
+##  CSS     : 375   1st Qu.:    1.000   1st Qu.: 0.000   1st Qu.:0.0000  
+##  HTML    :3607   Median :    2.000   Median : 1.000   Median :0.0000  
+##  Markdown:4187   Mean   :    6.469   Mean   : 7.839   Mean   :0.6727  
+##  TeX     : 344   3rd Qu.:    3.000   3rd Qu.:12.000   3rd Qu.:1.0000  
+##                  Max.   :10737.000   Max.   :98.000   Max.   :8.0000</code></pre>
+<div id="exploratory-data-analysis-1" class="section level3">
+<h3>Exploratory data analysis</h3>
+<p>Explore the data that will be used in analysis. Yikes! The number of files is really skewed and there are some packages with a ridiculously large number of files (&gt; 1000) for C-type language. Based on differences in the x-axis scale by language, it seems like there might be a difference among languages in probability of having a large number of files. For example, for Markdown the number of files seems to stay pretty small (mostly &lt; 18 files). If the number of files is large, it’s likely to be CSS or C-type language.</p>
+<p><strong>FIGURE 11. For each language, bar plot of the number of files per package.</strong></p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1"><span class="co"># Univariate summaries</span></a>
+<a class="sourceLine" id="cb71-2" data-line-number="2"><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(<span class="dt">x=</span>file)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb71-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb71-4" data-line-number="4"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Number of files&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb71-5" data-line-number="5"><span class="st">  </span><span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb71-6" data-line-number="6"><span class="st">  </span><span class="kw">facet_wrap</span>(language <span class="op">~</span><span class="st"> </span>., <span class="dt">scales =</span> <span class="st">&quot;free_x&quot;</span>)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q2_EDA1-1.png" width="672" /></p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" data-line-number="1"><span class="co"># Which are the data records with &gt; 1000 files in a package?</span></a>
+<a class="sourceLine" id="cb72-2" data-line-number="2">dat2[dat2<span class="op">$</span>file <span class="op">&gt;</span><span class="st"> </span><span class="dv">1000</span>,] <span class="co"># oh these are all C-type</span></a></code></pre></div>
+<pre><code>## # A tibble: 3 x 4
+##   language  file prop_comment maj_version
+##   &lt;fct&gt;    &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
+## 1 C-type   10737           16           1
+## 2 C-type    1594           16           1
+## 3 C-type    1974           32           2</code></pre>
+<p>The distribution of records among major version is similar for the three most frequent languages (C-type, Markdown, HTML). For CSS and TeX, the distribution is relatively more uniform among major versions–the sample sizes for these two languages is also very small.</p>
+<p><strong>FIGURE 12. For each language, bar plot of major version levels.</strong></p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1"><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(<span class="dt">x=</span>maj_version)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb74-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb74-3" data-line-number="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Major version&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb74-4" data-line-number="4"><span class="st">  </span><span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb74-5" data-line-number="5"><span class="st">  </span><span class="kw">facet_wrap</span>(language <span class="op">~</span><span class="st"> </span>., <span class="dt">scales =</span> <span class="st">&quot;free_x&quot;</span>)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q2_EDA2-1.png" width="672" /></p>
+<p>The languages do seem to differ in their distribution of % comment. Specifically, HMTL and Markdown files seem to have lower % comment than other languages. C-type files have larger % comment than other languages do.</p>
+<p><strong>FIGURE 13. For each language, distribution of % comment (i.e., proportion of code that is comments).</strong></p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1"><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(<span class="dt">x=</span>prop_comment)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb75-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;white&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb75-3" data-line-number="3"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;% comment&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Count&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb75-4" data-line-number="4"><span class="st">  </span><span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb75-5" data-line-number="5"><span class="st">  </span><span class="kw">facet_grid</span>(language <span class="op">~</span><span class="st"> </span>., <span class="dt">scales =</span> <span class="st">&quot;free&quot;</span>)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q2_EDA3-1.png" width="672" /></p>
+</div>
+<div id="train-a-model-1" class="section level3">
+<h3>Train a model</h3>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb76-2" data-line-number="2">trainset &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">createDataPartition</span>(<span class="dt">y =</span> dat2<span class="op">$</span>language, <span class="dt">p =</span> <span class="fl">0.7</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb76-3" data-line-number="3">data_train =<span class="st"> </span>dat2[trainset,] </a>
+<a class="sourceLine" id="cb76-4" data-line-number="4">data_test =<span class="st"> </span>dat2[<span class="op">-</span>trainset,] </a>
+<a class="sourceLine" id="cb76-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb76-6" data-line-number="6"><span class="co"># Check it</span></a>
+<a class="sourceLine" id="cb76-7" data-line-number="7"><span class="kw">dim</span>(dat2)</a></code></pre></div>
+<pre><code>## [1] 13753     4</code></pre>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1"><span class="kw">dim</span>(data_train)</a></code></pre></div>
+<pre><code>## [1] 9628    4</code></pre>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1"><span class="kw">dim</span>(data_test)</a></code></pre></div>
+<pre><code>## [1] 4125    4</code></pre>
+<p>I’ll use accuracy as the performance measure to track in this classification analysis. First, I’ll check accuracy of a null model, to serve as a baseline for comparing models. The accuracy of the null model is 38%, which is the proportion of the actual data that is C-type language, the most frequent (non-R) language.</p>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" data-line-number="1"><span class="kw">summary</span>(mod_null &lt;-<span class="st"> </span><span class="kw">multinom</span>(language <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> dat2))</a></code></pre></div>
+<pre><code>## # weights:  10 (4 variable)
+## initial  value 22134.599610 
+## iter  10 value 17482.891737
+## final  value 17482.866467 
+## converged</code></pre>
+<pre><code>## Call:
+## multinom(formula = language ~ 1, data = dat2)
+## 
+## Coefficients:
+##          (Intercept)
+## CSS       -2.6373906
+## HTML      -0.3735062
+## Markdown  -0.2243471
+## TeX       -2.7233154
+## 
+## Std. Errors:
+##          (Intercept)
+## CSS       0.05346103
+## HTML      0.02163527
+## Markdown  0.02072841
+## TeX       0.05565428
+## 
+## Residual Deviance: 34965.73 
+## AIC: 34973.73</code></pre>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb85-1" data-line-number="1">predict_null &lt;-<span class="st"> </span><span class="kw">predict</span>(mod_null) <span class="co"># the null model always predicts the highest frequency one, which is C-type</span></a>
+<a class="sourceLine" id="cb85-2" data-line-number="2">outcome &lt;-<span class="st"> </span>dat2<span class="op">$</span>language</a>
+<a class="sourceLine" id="cb85-3" data-line-number="3">(accur &lt;-<span class="st"> </span><span class="kw">mean</span>(outcome <span class="op">==</span><span class="st"> </span>predict_null)) <span class="co"># accuracy is 0.38</span></a></code></pre></div>
+<pre><code>## [1] 0.3810078</code></pre>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb87-1" data-line-number="1"><span class="kw">prop.table</span>(<span class="kw">table</span>(outcome)) <span class="co"># confirmed, that in the actual dataset 38% of the outcome is C-type, the most frequent outcome</span></a></code></pre></div>
+<pre><code>## outcome
+##     C-type        CSS       HTML   Markdown        TeX 
+## 0.38100778 0.02726678 0.26227005 0.30444267 0.02501272</code></pre>
+<div id="rpart-method-on-training-data" class="section level4">
+<h4>Rpart method on training data</h4>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb89-1" data-line-number="1">n_cores &lt;-<span class="st"> </span><span class="dv">4</span> </a>
+<a class="sourceLine" id="cb89-2" data-line-number="2">cl &lt;-<span class="st"> </span><span class="kw">makePSOCKcluster</span>(n_cores)</a>
+<a class="sourceLine" id="cb89-3" data-line-number="3"><span class="kw">registerDoParallel</span>(cl) </a>
+<a class="sourceLine" id="cb89-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb89-5" data-line-number="5"><span class="kw">set.seed</span>(<span class="dv">1111</span>) </a>
+<a class="sourceLine" id="cb89-6" data-line-number="6">fitControl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;repeatedcv&quot;</span>, <span class="dt">number=</span><span class="dv">5</span>, <span class="dt">repeats=</span><span class="dv">5</span>) </a>
+<a class="sourceLine" id="cb89-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb89-8" data-line-number="8">treetune_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">TuneLength =</span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">cp =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">10</span>), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">10</span>), <span class="dt">AccuracySD =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">10</span>))</a>
+<a class="sourceLine" id="cb89-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb89-10" data-line-number="10"><span class="cf">for</span>(t <span class="cf">in</span> treetune_df<span class="op">$</span>TuneLength) {</a>
+<a class="sourceLine" id="cb89-11" data-line-number="11">  rpart_fit =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(language  <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;rpart&quot;</span>,  <span class="dt">trControl =</span> fitControl, <span class="dt">na.action =</span> na.pass, <span class="dt">tuneLength =</span> t) </a>
+<a class="sourceLine" id="cb89-12" data-line-number="12">  </a>
+<a class="sourceLine" id="cb89-13" data-line-number="13">  best_acc &lt;-<span class="st"> </span>rpart_fit<span class="op">$</span>results[rpart_fit<span class="op">$</span>results<span class="op">$</span>Accuracy <span class="op">==</span><span class="st"> </span><span class="kw">max</span>(rpart_fit<span class="op">$</span>results<span class="op">$</span>Accuracy),]</a>
+<a class="sourceLine" id="cb89-14" data-line-number="14">  treetune_df[treetune_df<span class="op">$</span>TuneLength <span class="op">==</span><span class="st"> </span>t, ] &lt;-<span class="st"> </span><span class="kw">c</span>(t,  best_acc[<span class="kw">c</span>(<span class="st">&quot;cp&quot;</span>, <span class="st">&quot;Accuracy&quot;</span>, <span class="st">&quot;AccuracySD&quot;</span>)])</a>
+<a class="sourceLine" id="cb89-15" data-line-number="15">}</a></code></pre></div>
+<p>With the ‘rpart’ method and all predictors, we are able to get the accuracy up to 0.75. It seems like once we have at least a tune length of 4 in this analysis, we get close to the highest accuracy possible. With longer tune lengths, the accuracy can be slightly improved, but the trade-off is a more complicated tree for just a little better accuracy. [NOTE: I don’t know if it makes sense to compare different tune lengths instead of just running the analysis once with a large tune length, such as 10. But when I did the latter I got a complicated classification tree that was barely more accurate than the tree with the maximum tune length set at 4. I did the analysis this way so I could choose simpler models when more complicated models (longer tune length) barely improved accuracy.]</p>
+<p><strong>TABLE 5. Rpart method on training data: Model accuracy for different tune lengths.</strong></p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" data-line-number="1">knitr<span class="op">::</span><span class="kw">kable</span>(treetune_df)</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">TuneLength</th>
+<th align="right">cp</th>
+<th align="right">Accuracy</th>
+<th align="right">AccuracySD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">0.4394295</td>
+<td align="right">0.4993123</td>
+<td align="right">0.1363193</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">0.1367450</td>
+<td align="right">0.7022837</td>
+<td align="right">0.0409952</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">0.0104027</td>
+<td align="right">0.7437671</td>
+<td align="right">0.0075545</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">0.0005872</td>
+<td align="right">0.7495012</td>
+<td align="right">0.0067422</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">0.0005034</td>
+<td align="right">0.7501867</td>
+<td align="right">0.0071441</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">0.0005034</td>
+<td align="right">0.7507476</td>
+<td align="right">0.0066740</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">0.0005872</td>
+<td align="right">0.7503948</td>
+<td align="right">0.0088835</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">0.0005034</td>
+<td align="right">0.7501040</td>
+<td align="right">0.0054979</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">0.0005872</td>
+<td align="right">0.7499785</td>
+<td align="right">0.0076188</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">0.0005872</td>
+<td align="right">0.7506220</td>
+<td align="right">0.0069302</td>
+</tr>
+</tbody>
+</table>
+<p>I chose a tune length of four as the optimal tune length for a simple but relatively accurate model. With a tune length of four, the most important split occurs between records that have &gt;= 3% comments (most likely language = C-type) and those that have &lt; 3% comments (all other languages). The next split is also based on % comments–those with &gt;= 1% comments are most likely to be HTML. The final split depends on number of files for records with &lt; 1% comments. Among those records, when the number of files is &gt;= 3, the most likely language is HTML; otherwise, Markdown. This tree doesn’t parse out CSS and TeX languages, but those are the least common languages in this dataset (dat2).</p>
+<p><strong>FIGURE 14. Classification tree for tune length of 4.</strong></p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb91-1" data-line-number="1">rpart_fit4 =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(language  <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;rpart&quot;</span>,  <span class="dt">trControl =</span> fitControl, <span class="dt">na.action =</span> na.pass, <span class="dt">tuneLength =</span> <span class="dv">4</span>) </a>
+<a class="sourceLine" id="cb91-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb91-3" data-line-number="3"><span class="kw">print</span>(rpart_fit4<span class="op">$</span>results)</a></code></pre></div>
+<pre><code>##             cp  Accuracy     Kappa  AccuracySD    KappaSD
+## 1 0.0005872483 0.7503106 0.6281594 0.006909923 0.01028994
+## 2 0.0104026846 0.7435599 0.6179606 0.007205923 0.01116113
+## 3 0.1367449664 0.6980855 0.5477286 0.041751338 0.06393927
+## 4 0.4394295302 0.4883631 0.1894298 0.134256533 0.23680068</code></pre>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb93-1" data-line-number="1"><span class="kw">prp</span>( rpart_fit4<span class="op">$</span>finalModel, <span class="dt">extra =</span> <span class="dv">1</span>, <span class="dt">type =</span> <span class="dv">1</span>)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q2_rpartresult-1.png" width="672" /></p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" data-line-number="1">ww=<span class="fl">17.8</span><span class="op">/</span><span class="fl">2.54</span>; wh=ww; <span class="co">#for saving plot</span></a>
+<a class="sourceLine" id="cb94-2" data-line-number="2"><span class="kw">dev.print</span>(<span class="dt">device=</span>png,<span class="dt">width=</span>ww,<span class="dt">height=</span>wh,<span class="dt">units=</span><span class="st">&quot;in&quot;</span>,<span class="dt">res=</span><span class="dv">600</span>,<span class="dt">file=</span><span class="st">&quot;rparttree.png&quot;</span>) <span class="co">#save tree to file</span></a></code></pre></div>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="random-forest-method-on-training-data" class="section level4">
+<h4>Random forest method on training data</h4>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" data-line-number="1"><span class="co"># set.seed(1111)</span></a>
+<a class="sourceLine" id="cb96-2" data-line-number="2"><span class="co"># tuning_grid &lt;- expand.grid( .mtry = seq(1,3,by=1), .splitrule = &quot;gini&quot;, .min.node.size = seq(2,8,by=1) )</span></a>
+<a class="sourceLine" id="cb96-3" data-line-number="3"><span class="co"># ranger_fit &lt;- caret::train(language ~ ., data=data_train, method=&quot;ranger&quot;,  trControl = fitControl, tuneGrid = tuning_grid, na.action = na.pass)</span></a>
+<a class="sourceLine" id="cb96-4" data-line-number="4"><span class="co"># </span></a>
+<a class="sourceLine" id="cb96-5" data-line-number="5"><span class="co"># saveRDS(ranger_fit, &quot;TidyTuesday2_ranger_fit.RDS&quot;) # I&#39;m saving it because it takes a long time to run. So when re-running this script I will just load the .RDS.</span></a></code></pre></div>
+<p>With the random forest method, we get a combination of trees as the “product”. We can plot model performance as a function of the model tuning parameters. This plot suggests that we get the best model with two predictors and a minimum node size of seven. The highest accuracy from repeated cross-validation is just over 0.75. These results are consistent with what we found with the ‘rpart’ method.</p>
+<p><strong>FIGURE 15. Random forest method on training data: Model performance as a function of tuning parameters.</strong></p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb97-1" data-line-number="1">ranger_fit &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&quot;TidyTuesday2_ranger_fit.RDS&quot;</span>)</a>
+<a class="sourceLine" id="cb97-2" data-line-number="2"><span class="kw">plot</span>(ranger_fit)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q2_randomforestresult-1.png" width="672" /></p>
+</div>
+<div id="rpart-with-centered-and-scaled-predictors" class="section level4">
+<h4>Rpart with centered and scaled predictors</h4>
+<p>As a final try, I’ll repeat the ‘rpart’ analysis, but with scaled and centered predictors to see how that affects results.</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">1111</span>) </a>
+<a class="sourceLine" id="cb98-2" data-line-number="2">treetuneCS_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">TuneLength =</span><span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">cp =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">10</span>), <span class="dt">Accuracy =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">10</span>), <span class="dt">AccuracySD =</span> <span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">10</span>))</a>
+<a class="sourceLine" id="cb98-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb98-4" data-line-number="4"><span class="cf">for</span>(t <span class="cf">in</span> treetuneCS_df<span class="op">$</span>TuneLength) {</a>
+<a class="sourceLine" id="cb98-5" data-line-number="5">  rpart_fitCS =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(language  <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;rpart&quot;</span>, <span class="dt">preProcess =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>), <span class="dt">trControl =</span> fitControl, <span class="dt">na.action =</span> na.pass, <span class="dt">tuneLength =</span> t) </a>
+<a class="sourceLine" id="cb98-6" data-line-number="6">  </a>
+<a class="sourceLine" id="cb98-7" data-line-number="7">  best_accCS &lt;-<span class="st"> </span>rpart_fitCS<span class="op">$</span>results[rpart_fitCS<span class="op">$</span>results<span class="op">$</span>Accuracy <span class="op">==</span><span class="st"> </span><span class="kw">max</span>(rpart_fitCS<span class="op">$</span>results<span class="op">$</span>Accuracy),]</a>
+<a class="sourceLine" id="cb98-8" data-line-number="8">  treetuneCS_df[treetuneCS_df<span class="op">$</span>TuneLength <span class="op">==</span><span class="st"> </span>t, ] &lt;-<span class="st"> </span><span class="kw">c</span>(t,  best_accCS[<span class="kw">c</span>(<span class="st">&quot;cp&quot;</span>, <span class="st">&quot;Accuracy&quot;</span>, <span class="st">&quot;AccuracySD&quot;</span>)])</a>
+<a class="sourceLine" id="cb98-9" data-line-number="9">  }</a></code></pre></div>
+<p>It doesn’t seem like scaling and centering predictors changed results any. The most important predictors are still proportion comment and number of files. The actual threshold values for splits is different because we’re working with centered and scaled data now.</p>
+<p><strong>TABLE 6. Rpart method on training data, but with scaled and centered predictors: Model accuracy for different tune lengths.</strong></p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb99-1" data-line-number="1">knitr<span class="op">::</span><span class="kw">kable</span>(treetuneCS_df)</a></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">TuneLength</th>
+<th align="right">cp</th>
+<th align="right">Accuracy</th>
+<th align="right">AccuracySD</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">0.4394295</td>
+<td align="right">0.4993123</td>
+<td align="right">0.1363193</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">0.1367450</td>
+<td align="right">0.7022837</td>
+<td align="right">0.0409952</td>
+</tr>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">0.0104027</td>
+<td align="right">0.7437671</td>
+<td align="right">0.0075545</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">0.0005872</td>
+<td align="right">0.7495012</td>
+<td align="right">0.0067422</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">0.0005034</td>
+<td align="right">0.7501867</td>
+<td align="right">0.0071441</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">0.0005034</td>
+<td align="right">0.7507476</td>
+<td align="right">0.0066740</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">0.0005872</td>
+<td align="right">0.7503948</td>
+<td align="right">0.0088835</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">0.0005034</td>
+<td align="right">0.7501040</td>
+<td align="right">0.0054979</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">0.0005872</td>
+<td align="right">0.7499785</td>
+<td align="right">0.0076188</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">0.0005872</td>
+<td align="right">0.7506220</td>
+<td align="right">0.0069302</td>
+</tr>
+</tbody>
+</table>
+<p><strong>FIGURE 16. Classification tree for tune length of 4, with scaled and centered predictors.</strong></p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" data-line-number="1">rpartCS_fit4 =<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(language  <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data_train, <span class="dt">method=</span><span class="st">&quot;rpart&quot;</span>,  <span class="dt">preProcess =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>), <span class="dt">trControl =</span> fitControl, <span class="dt">na.action =</span> na.pass, <span class="dt">tuneLength =</span> <span class="dv">4</span>) <span class="co"># Again a tune length of 4 seems like a good compromise between interpretability and accuracy.</span></a>
+<a class="sourceLine" id="cb100-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb100-3" data-line-number="3"><span class="kw">print</span>(rpartCS_fit4)</a></code></pre></div>
+<pre><code>## CART 
+## 
+## 9628 samples
+##    3 predictor
+##    5 classes: &#39;C-type&#39;, &#39;CSS&#39;, &#39;HTML&#39;, &#39;Markdown&#39;, &#39;TeX&#39; 
+## 
+## Pre-processing: centered (3), scaled (3) 
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 7702, 7703, 7701, 7703, 7703, 7703, ... 
+## Resampling results across tuning parameters:
+## 
+##   cp            Accuracy   Kappa    
+##   0.0005872483  0.7503106  0.6281594
+##   0.0104026846  0.7435599  0.6179606
+##   0.1367449664  0.6980855  0.5477286
+##   0.4394295302  0.4883631  0.1894298
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was cp = 0.0005872483.</code></pre>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1"><span class="kw">prp</span>(rpartCS_fit4<span class="op">$</span>finalModel, <span class="dt">extra =</span> <span class="dv">1</span>, <span class="dt">type =</span> <span class="dv">1</span>)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q2_rpartCSresult-1.png" width="672" /></p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1">ww=<span class="fl">17.8</span><span class="op">/</span><span class="fl">2.54</span>; wh=ww; <span class="co">#for saving plot</span></a>
+<a class="sourceLine" id="cb103-2" data-line-number="2"><span class="kw">dev.print</span>(<span class="dt">device=</span>png,<span class="dt">width=</span>ww,<span class="dt">height=</span>wh,<span class="dt">units=</span><span class="st">&quot;in&quot;</span>,<span class="dt">res=</span><span class="dv">600</span>,<span class="dt">file=</span><span class="st">&quot;rpartCStree.png&quot;</span>) <span class="co">#save tree to file</span></a></code></pre></div>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+</div>
+<div id="model-uncertainty-1" class="section level3">
+<h3>Model uncertainty</h3>
+<p>I’ll use resampling to compare the performance of the three models I’ve tried: 1) rpart classification tree, 2) random forest, 3) rpart classification tree with scaled, centered predictors. Figure 17 suggests that the three models really do have about equal performance in terms of accuracy.</p>
+<p><strong>FIGURE 17. Comparison of model uncertainty for the classification tree and random forest models.</strong></p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1">resamps &lt;-<span class="st"> </span><span class="kw">resamples</span>(<span class="kw">list</span>(<span class="dt">tree =</span> rpart_fit4,</a>
+<a class="sourceLine" id="cb105-2" data-line-number="2">                          <span class="dt">RF =</span> ranger_fit,</a>
+<a class="sourceLine" id="cb105-3" data-line-number="3">                          <span class="dt">treeCS =</span> rpartCS_fit4))</a>
+<a class="sourceLine" id="cb105-4" data-line-number="4"><span class="kw">bwplot</span>(resamps)</a></code></pre></div>
+<p><img src="TidyTuesday2_files/figure-html/Q2_randomforest-3-1.png" width="672" /></p>
+</div>
+<div id="diagnostic-summaries" class="section level3">
+<h3>Diagnostic summaries</h3>
+<p>I’ll generate diagnostic summaries for the random forest model. Specifically, I’ll look for any patterns of the confusion matrix of true versus predicted outcomes. We have 75% accuracy with this model. The most common predictive “mistake” seems to be predicting Markdown when it’s actually HTML. Overall (balanced accuracy), the model does best with predicting C-type correctly, followed by Markdown.</p>
+<p><strong>TABLE 7. Predicted versus actual languages for random forest model on training data.</strong></p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" data-line-number="1">data_train<span class="op">$</span>PredictRF &lt;-<span class="st"> </span><span class="kw">predict</span>(ranger_fit, data_train)</a>
+<a class="sourceLine" id="cb106-2" data-line-number="2">data_train =<span class="st"> </span>expss<span class="op">::</span><span class="kw">apply_labels</span>(data_train,</a>
+<a class="sourceLine" id="cb106-3" data-line-number="3">                      <span class="dt">PredictRF =</span> <span class="st">&quot;Predicted Language (random forest)&quot;</span>,</a>
+<a class="sourceLine" id="cb106-4" data-line-number="4">                      <span class="dt">language =</span> <span class="st">&quot;Actual Language&quot;</span>)</a>
+<a class="sourceLine" id="cb106-5" data-line-number="5">(acc_table &lt;-<span class="st"> </span><span class="kw">cro</span>(data_train<span class="op">$</span>PredictRF, data_train<span class="op">$</span>language))</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<thead>
+<tr>
+<th style="border-top: 2px solid grey;">
+</th>
+<th colspan="5" style="font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+ Actual Language 
+</th>
+</tr>
+<tr>
+<th style="font-weight: 900; border-bottom: 1px solid grey; text-align: center;">
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ C-type 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ CSS 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ HTML 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Markdown 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ TeX 
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="6" style="font-weight: 900;">
+ Predicted Language (random forest) 
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   C-type 
+</td>
+<td style="text-align: right;">
+3375
+</td>
+<td style="text-align: right;">
+122
+</td>
+<td style="text-align: right;">
+87
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+178
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   CSS 
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+5
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   HTML 
+</td>
+<td style="text-align: right;">
+165
+</td>
+<td style="text-align: right;">
+68
+</td>
+<td style="text-align: right;">
+1138
+</td>
+<td style="text-align: right;">
+160
+</td>
+<td style="text-align: right;">
+21
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Markdown 
+</td>
+<td style="text-align: right;">
+127
+</td>
+<td style="text-align: right;">
+67
+</td>
+<td style="text-align: right;">
+1299
+</td>
+<td style="text-align: right;">
+2771
+</td>
+<td style="text-align: right;">
+29
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   TeX 
+</td>
+<td style="text-align: right;">
+1
+</td>
+<td style="text-align: right;">
+1
+</td>
+<td style="text-align: right;">
+1
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+13
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+   #Total cases 
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+3668
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+263
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+2525
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+2931
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+241
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">diag</span>(<span class="kw">as.matrix</span>(acc_table[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">6</span>])), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)<span class="op">/</span><span class="kw">sum</span>(<span class="kw">as.matrix</span>(acc_table[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">6</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="co"># 0.75</span></a></code></pre></div>
+<pre><code>## [1] 0.758413</code></pre>
+<p><strong>TABLE 8. Confusion matrix for random forest model on training data.</strong></p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="dt">data =</span> data_train<span class="op">$</span>PredictRF, <span class="dt">reference =</span> data_train<span class="op">$</span>language)</a></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction C-type  CSS HTML Markdown  TeX
+##   C-type     3375  122   87        0  178
+##   CSS           0    5    0        0    0
+##   HTML        165   68 1138      160   21
+##   Markdown    127   67 1299     2771   29
+##   TeX           1    1    1        0   13
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.7584          
+##                  95% CI : (0.7497, 0.7669)
+##     No Information Rate : 0.381           
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.6411          
+##                                           
+##  Mcnemar&#39;s Test P-Value : &lt; 2.2e-16       
+## 
+## Statistics by Class:
+## 
+##                      Class: C-type Class: CSS Class: HTML Class: Markdown
+## Sensitivity                 0.9201  0.0190114      0.4507          0.9454
+## Specificity                 0.9351  1.0000000      0.9417          0.7727
+## Pos Pred Value              0.8971  1.0000000      0.7332          0.6455
+## Neg Pred Value              0.9501  0.9731892      0.8283          0.9700
+## Prevalence                  0.3810  0.0273162      0.2623          0.3044
+## Detection Rate              0.3505  0.0005193      0.1182          0.2878
+## Detection Prevalence        0.3907  0.0005193      0.1612          0.4459
+## Balanced Accuracy           0.9276  0.5095057      0.6962          0.8591
+##                      Class: TeX
+## Sensitivity            0.053942
+## Specificity            0.999680
+## Pos Pred Value         0.812500
+## Neg Pred Value         0.976280
+## Prevalence             0.025031
+## Detection Rate         0.001350
+## Detection Prevalence   0.001662
+## Balanced Accuracy      0.526811</code></pre>
+</div>
+<div id="apply-the-model-to-the-test-data-1" class="section level3">
+<h3>Apply the model to the test data</h3>
+<p>Finally, I’ll see how the random forest model does when applied to the test data that were set aside. This will give us a better idea of the model’s true performance.</p>
+<p><strong>TABLE 9. Predicted versus actual languages for random forest model on TEST data.</strong></p>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1">data_test<span class="op">$</span>PredictRF &lt;-<span class="st"> </span><span class="kw">predict</span>(ranger_fit, data_test)</a>
+<a class="sourceLine" id="cb111-2" data-line-number="2">data_test =<span class="st"> </span>expss<span class="op">::</span><span class="kw">apply_labels</span>(data_test,</a>
+<a class="sourceLine" id="cb111-3" data-line-number="3">                      <span class="dt">PredictRF =</span> <span class="st">&quot;Predicted Number of Languages (random forest)&quot;</span>,</a>
+<a class="sourceLine" id="cb111-4" data-line-number="4">                      <span class="dt">language =</span> <span class="st">&quot;Actual Number of Languages&quot;</span>)</a>
+<a class="sourceLine" id="cb111-5" data-line-number="5">(acc_table_test &lt;-<span class="st"> </span><span class="kw">cro</span>(data_test<span class="op">$</span>PredictRF, data_test<span class="op">$</span>language))</a></code></pre></div>
+<table class="gmisc_table" style="border-collapse: collapse; margin-top: 1em; margin-bottom: 1em;">
+<thead>
+<tr>
+<th style="border-top: 2px solid grey;">
+</th>
+<th colspan="5" style="font-weight: 900; border-bottom: 1px solid grey; border-top: 2px solid grey; text-align: center;">
+ Actual Number of Languages 
+</th>
+</tr>
+<tr>
+<th style="font-weight: 900; border-bottom: 1px solid grey; text-align: center;">
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ C-type 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ CSS 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ HTML 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ Markdown 
+</th>
+<th style="border-bottom: 1px solid grey; text-align: center;">
+ TeX 
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="6" style="font-weight: 900;">
+ Predicted Number of Languages (random forest) 
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   C-type 
+</td>
+<td style="text-align: right;">
+1450
+</td>
+<td style="text-align: right;">
+53
+</td>
+<td style="text-align: right;">
+50
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+80
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   CSS 
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   HTML 
+</td>
+<td style="text-align: right;">
+75
+</td>
+<td style="text-align: right;">
+32
+</td>
+<td style="text-align: right;">
+461
+</td>
+<td style="text-align: right;">
+87
+</td>
+<td style="text-align: right;">
+11
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   Markdown 
+</td>
+<td style="text-align: right;">
+41
+</td>
+<td style="text-align: right;">
+27
+</td>
+<td style="text-align: right;">
+569
+</td>
+<td style="text-align: right;">
+1169
+</td>
+<td style="text-align: right;">
+7
+</td>
+</tr>
+<tr>
+<td style="text-align: left;">
+   TeX 
+</td>
+<td style="text-align: right;">
+6
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+2
+</td>
+<td style="text-align: right;">
+</td>
+<td style="text-align: right;">
+5
+</td>
+</tr>
+<tr>
+<td style="border-bottom: 2px solid grey; text-align: left;">
+   #Total cases 
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+1572
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+112
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+1082
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+1256
+</td>
+<td style="border-bottom: 2px solid grey; text-align: right;">
+103
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1"><span class="kw">sum</span>(<span class="kw">diag</span>(<span class="kw">as.matrix</span>(acc_table_test[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">6</span>])), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)<span class="op">/</span><span class="kw">sum</span>(<span class="kw">as.matrix</span>(acc_table_test[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">6</span>]), <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="co"># 0.75</span></a></code></pre></div>
+<pre><code>## [1] 0.7478788</code></pre>
+<p><strong>TABLE 10. Confusion matrix for random forest model on TEST data.</strong></p>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="dt">data =</span> data_test<span class="op">$</span>PredictRF, <span class="dt">reference =</span> data_test<span class="op">$</span>language)</a></code></pre></div>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction C-type  CSS HTML Markdown  TeX
+##   C-type     1450   53   50        0   80
+##   CSS           0    0    0        0    0
+##   HTML         75   32  461       87   11
+##   Markdown     41   27  569     1169    7
+##   TeX           6    0    2        0    5
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.7479          
+##                  95% CI : (0.7343, 0.7611)
+##     No Information Rate : 0.3811          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.6253          
+##                                           
+##  Mcnemar&#39;s Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: C-type Class: CSS Class: HTML Class: Markdown
+## Sensitivity                 0.9224    0.00000      0.4261          0.9307
+## Specificity                 0.9283    1.00000      0.9326          0.7755
+## Pos Pred Value              0.8879        NaN      0.6922          0.6448
+## Neg Pred Value              0.9510    0.97285      0.8205          0.9624
+## Prevalence                  0.3811    0.02715      0.2623          0.3045
+## Detection Rate              0.3515    0.00000      0.1118          0.2834
+## Detection Prevalence        0.3959    0.00000      0.1615          0.4395
+## Balanced Accuracy           0.9254    0.50000      0.6793          0.8531
+##                      Class: TeX
+## Sensitivity            0.048544
+## Specificity            0.998011
+## Pos Pred Value         0.384615
+## Neg Pred Value         0.976167
+## Prevalence             0.024970
+## Detection Rate         0.001212
+## Detection Prevalence   0.003152
+## Balanced Accuracy      0.523277</code></pre>
+<p>Model performance on the test data is not bad. For C-type especially, the model does pretty well. None of the test data were actually CSS, but that was a very small class in the original data anyway. As with the training data, a common predictive “mistake” of this random forest model seems to be predicting Markdown when it’s actually HTML.</p>
+</div>
+<div id="q2-conclusions" class="section level3">
+<h3>Q2 conclusions</h3>
+<p>MY CONCLUSION FROM THIS ANALYSIS is that a relatively small number of prediction splits can classify languages with not-too-bad accuracy (75% accuracy) compared to the null model (38% accuracy). The most important predictors are % comments (with splits at 1% and 3% comments) and, secondarily, the number of files (with a split at 3 files). The model is pretty good at correctly classifying C-type language and not too bad with Markdown. Its performance with classifying HTML is meh. The other two languages were pretty infrequent in the data, so it’s not too surprising that the model isn’t great at classifying them (CSS and TeX).</p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1"><span class="kw">stopCluster</span>(cl)</a></code></pre></div>
 </div>
 </div>
 
